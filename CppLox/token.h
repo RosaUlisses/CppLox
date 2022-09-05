@@ -29,12 +29,12 @@ enum token_type{
 
 struct token{
 
-    token_type type;
-    std::string lexeme;
-    literal_type literal;
-    int line;
+    const token_type type;
+    const std::string lexeme;
+    const literal_type literal;
+    const int line;
 
-    token(token_type type, std::string lexeme, literal_type literal, int line);
+    token(token_type type, std::string lexeme, literal_type literal, int line): type(type), lexeme(lexeme), literal(literal), line(line) {};
 };
 
 #endif //CPPLOX_TOKEN_H
