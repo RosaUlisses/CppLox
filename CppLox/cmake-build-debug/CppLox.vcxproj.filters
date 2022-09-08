@@ -4,28 +4,11 @@
     <ClCompile Include="C:\Programação\CppLox\CppLox\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Programação\CppLox\CppLox\lexer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Programação\CppLox\CppLox\token.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="C:\Programação\CppLox\CppLox\lexer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Programação\CppLox\CppLox\token.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Programação\CppLox\CppLox\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{6729AB23-0A09-331A-88C7-41C1C3538CCF}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{12F92F85-B5A8-34A5-9332-CB06FB97DB49}</UniqueIdentifier>
     </Filter>

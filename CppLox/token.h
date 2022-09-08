@@ -1,5 +1,5 @@
-#ifndef CPPLOX_TOKEN_H
-#define CPPLOX_TOKEN_H
+#ifndef TOKEN_H
+#define TOKEN_H
 
 #include <string>
 #include <variant>
@@ -9,8 +9,8 @@ typedef std::variant<double,std::string> literal_type;
 enum token_type{
 
     // Single character tokens
-    LEFT_PARENTESIS, RIGHT_PARENTESIS, COMMA, 
-    SEMICOLON, DOT, MINUS, PLUS, STAR, SLASH, 
+    LEFT_PARENTESIS, RIGHT_PARENTESIS, COMMA,
+    SEMICOLON, DOT, MINUS, PLUS, STAR, SLASH,
     LEFT_BRACE, RIGHT_BRACE, EQUAL, BANG, LESS,
     GREATER,
 

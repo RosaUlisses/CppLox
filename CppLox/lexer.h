@@ -3,16 +3,18 @@
 
 #include <string>
 #include <vector>
-#include <ctype.h>
+#include <unordered_map>
 #include "token.h"
+#include <cctype>
+#include <iostream>
 
 class lexer{
 
 public:
-    static std::vector<token> scanTokens(std::string source);
-
+    static std::vector<token> scan_tokens(std::string source);
 
 private:
+    static std::unordered_map<std::string, token_type> key_words;
     static std::string source;
     static std::vector<token> tokens;
     static int start;
@@ -20,17 +22,11 @@ private:
     static int line;
 
     static bool is_current_at_end();
-    static void scanToken();
+    static void scan_token();
+    static void scan_string();
+    static void scan_identifier();
     static void scan_number();
-    static void addToken(token_type type, literal_type literal = "");
+    static void add_token(token_type type, literal_type literal = "");
 };
-
-
-std::string lexer::source = "";
-std::vector<token> lexer::tokens;
-int lexer::start = 0;
-int lexer::current = 0;
-int lexer::line = 1;
-
 
 #endif
