@@ -1,33 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Programação\Pessoal\CppLox\CppLox\lexer.cpp">
+    <ClCompile Include="C:\Programação\CppLox\CppLox\lexer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Programação\Pessoal\CppLox\CppLox\main.cpp">
+    <ClCompile Include="C:\Programação\CppLox\CppLox\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Programação\Pessoal\CppLox\CppLox\token.cpp">
+    <ClCompile Include="C:\Programação\CppLox\CppLox\token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Programação\Pessoal\CppLox\CppLox\lexer.h">
+    <ClInclude Include="C:\Programação\CppLox\CppLox\lexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Programação\Pessoal\CppLox\CppLox\token.h">
+    <ClInclude Include="C:\Programação\CppLox\CppLox\token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Programação\Pessoal\CppLox\CMakeLists.txt" />
+    <CustomBuild Include="C:\Programação\CppLox\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{F585439D-AD9E-36AC-A013-7F2C24BE0384}</UniqueIdentifier>
+      <UniqueIdentifier>{4B7D8CFE-2EFE-3E67-A8BE-1F8CC4B8B53B}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{FABF8EDE-0684-37AA-8C5C-3D3F2AD60F92}</UniqueIdentifier>
+      <UniqueIdentifier>{A06B15B3-1A4E-34CA-BE14-30869D6095D6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

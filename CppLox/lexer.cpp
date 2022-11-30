@@ -37,7 +37,6 @@ std::vector<token> lexer::scan_tokens(std::string source){
 }
 
 void lexer::scan_token(){
-    int& c = current;
     switch (source[current])
     {
         case '(' :

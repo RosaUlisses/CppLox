@@ -11,3 +11,5 @@ add_executable(CppLox
         CppLox/main.cpp
         CppLox/token.cpp
         CppLox/token.h CppLox/token.h)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
