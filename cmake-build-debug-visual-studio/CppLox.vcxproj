@@ -316,8 +316,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Programação\CppLox\CppLox\lexer.cpp" />
     <ClInclude Include="C:\Programação\CppLox\CppLox\lexer.h" />
     <ClCompile Include="C:\Programação\CppLox\CppLox\main.cpp" />
-    <ClCompile Include="C:\Programação\CppLox\CppLox\token.cpp" />
     <ClInclude Include="C:\Programação\CppLox\CppLox\token.h" />
+    <ClCompile Include="C:\Programação\CppLox\CppLox\parser.cpp" />
+    <ClInclude Include="C:\Programação\CppLox\CppLox\parser.h" />
+    <ClInclude Include="C:\Programação\CppLox\CppLox\expression.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Programação\CppLox\cmake-build-debug-visual-studio\ZERO_CHECK.vcxproj">

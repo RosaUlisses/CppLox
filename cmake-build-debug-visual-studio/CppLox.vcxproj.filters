@@ -7,7 +7,7 @@
     <ClCompile Include="C:\Programação\CppLox\CppLox\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Programação\CppLox\CppLox\token.cpp">
+    <ClCompile Include="C:\Programação\CppLox\CppLox\parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -16,6 +16,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Programação\CppLox\CppLox\token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Programação\CppLox\CppLox\parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Programação\CppLox\CppLox\expression.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

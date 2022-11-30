@@ -28,7 +28,6 @@ enum token_type{
 };
 
 struct token{
-
     const token_type type;
     const std::string lexeme;
     const literal_type literal;

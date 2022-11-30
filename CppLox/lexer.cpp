@@ -40,12 +40,12 @@ void lexer::scan_token(){
     switch (source[current])
     {
         case '(' :
-            add_token(LEFT_BRACE);
+            add_token(LEFT_PARENTESIS);
             current++;
         break;
 
         case ')' :
-            add_token(RIGHT_BRACE);
+            add_token(RIGHT_PARENTESIS);
             current++;
         break;
 
@@ -60,27 +60,27 @@ void lexer::scan_token(){
         break;
 
         case '.' :
-            add_token(LEFT_BRACE);
+            add_token(DOT);
             current++;
         break;
 
         case '-' :
-            add_token(LEFT_BRACE);
+            add_token(MINUS);
             current++;
         break;
 
         case '+' :
-            add_token(LEFT_BRACE);
+            add_token(PLUS);
             current++;
         break;
 
         case '*' :
-            add_token(LEFT_BRACE);
+            add_token(STAR);
             current++;
         break;
 
         case '/' :
-            add_token(LEFT_BRACE);
+            add_token(SLASH);
             current++;
         break;
 
@@ -90,7 +90,7 @@ void lexer::scan_token(){
         break;
 
         case '}' :
-            add_token(LEFT_BRACE);
+            add_token(RIGHT_BRACE);
             current++;
         break;
 

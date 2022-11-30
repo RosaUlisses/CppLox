@@ -9,7 +9,6 @@ add_executable(CppLox
         CppLox/lexer.cpp
         CppLox/lexer.h
         CppLox/main.cpp
-        CppLox/token.cpp
-        CppLox/token.h CppLox/token.h)
+        CppLox/token.h CppLox/token.h CppLox/parser.cpp CppLox/parser.h CppLox/expression.h)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
