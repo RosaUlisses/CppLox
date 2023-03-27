@@ -1,3 +1,0 @@
-C:/Programação/CppLox/CppLox/cmake-build-debug/CMakeFiles/CppLox.dir
-C:/Programação/CppLox/CppLox/cmake-build-debug/CMakeFiles/ALL_BUILD.dir
-C:/Programação/CppLox/CppLox/cmake-build-debug/CMakeFiles/ZERO_CHECK.dir

@@ -7,7 +7,7 @@ class expression {
 
 };
 
-class bynary_expression : expression{
+class bynary_expression : expression {
     public:
         const expression& left;
         const token operator_;
@@ -33,9 +33,8 @@ class grouping_expression : expression {
 
 class literal_expression : expression {
     public:
-        const literal_value literal;
-
-        literal_expression(literal_value literal) : literal(literal) {};
+//        const literal_value literal;
+//        literal_expression(literal_value literal) : literal(literal) {};
 };
 
 

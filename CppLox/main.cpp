@@ -3,7 +3,7 @@
 #include "token.h"
 
 int main() {
-    std::string source =  "if(x >= buceta){\n buceta = x + 1;\n x = \"ulissao\" + 1.234 }";
+    std::string source =  "";
     std::vector<token> tokens = lexer::scan_tokens(source);
     std::cout << "oi";
     return 0;
