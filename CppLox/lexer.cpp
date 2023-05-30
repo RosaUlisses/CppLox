@@ -33,6 +33,8 @@ std::vector<token> lexer::scan_tokens(std::string source) {
         start = current;
         scan_token();
     }
+    
+    tokens.push_back(token(END_OF_FILE, "", nullptr, line));
     return tokens;
 }
 

@@ -1,18 +1,17 @@
 #include "parser.h"
 #include <algorithm>
 
-bool parser::match(const std::vector<token_type>& token_list) {
-    bool result = std::any_of(token_list.begin(), token_list.end(), [&](const token_type& t){return tokens[current].type == t;});
-    current++;
-    return result;
-}
 
-bool parser::is_current_at_end() {
-   return current >= tokens.size();
-}
+parser::parser(std::vector<token> tokens): tokens(tokens) {}
 
-token parser::get_previous_token() {
-    return tokens[current - 1];
+parser::parse_error::parse_error() : runtime_error("") {}
+
+expression parser::parse() {
+    try {
+        return parse_expression();
+    } catch(parse_error& error) {
+        return {};
+    } 
 }
 
 expression parser::parse_expression() {
@@ -84,7 +83,38 @@ expression parser::primary() {
 
     if (match({LEFT_PARENTESIS})) {
         auto expression = parse_expression();
-        // todo -> consume )
+        consume(RIGHT_PARENTESIS, "Expect ')' after expression.");
         return grouping_expression(expression);
     }
+    
+    throw generate_parse_error(tokens[current], "Expect expression.");
+}
+
+void parser::consume(token_type type, std::string mensage) {
+    if (tokens[current].type == type) {
+        current++;
+        return;
+    }
+    
+    throw generate_parse_error(tokens[current], mensage);
+}
+
+
+parser::parse_error parser::generate_parse_error(token token, std::string mensage) {
+    report_error(token, mensage);   
+    return parse_error();
+}
+
+bool parser::match(const std::vector<token_type>& token_list) {
+    bool result = std::any_of(token_list.begin(), token_list.end(), [&](const token_type& t){return tokens[current].type == t;});
+    current++;
+    return result;
+}
+
+bool parser::is_current_at_end() {
+    return current >= tokens.size();
+}
+
+token parser::get_previous_token() {
+    return tokens[current - 1];
 }

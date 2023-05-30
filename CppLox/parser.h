@@ -2,10 +2,20 @@
 #define CPPLOX_PARSER_H
 
 #include <vector>
+#include <stdexcept>
 #include "token.h"
 #include "expression.h"
+#include "error_handling.h"
 
 class parser {
+public:
+    class parse_error : public std::runtime_error {
+    public:
+        parse_error();
+    };
+    parser(std::vector<token> tokens);
+    expression parse();
+
 private:
     std::vector<token> tokens;
     int current = 0;
@@ -22,12 +32,8 @@ private:
     expression factor();
     expression unary();
     expression primary();
-
-
-public:
-    parser(std::vector<token> tokens) : tokens(tokens) {};
-    expression parse();
-
+    void consume(token_type type, std::string mensage);
+    parse_error generate_parse_error(token token, std::string mensage); 
 };
 
 
