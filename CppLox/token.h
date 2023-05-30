@@ -4,9 +4,9 @@
 #include <string>
 #include <variant>
 
-typedef std::variant<double,std::string> literal_type;
+typedef std::variant<double, std::string, void*> literal_type;
 
-enum token_type{
+enum token_type {
 
     // Single character tokens
     LEFT_PARENTESIS, RIGHT_PARENTESIS, COMMA,
@@ -21,19 +21,24 @@ enum token_type{
     IDENTIFIER, NUMBER, STRING,
 
     // Keywords
-    IF, ELSE, FOR, WHILE, AND, OR, TRUE, FALSE, CLASS, THIS, SUPER,
+    IF, ELSE, FOR, WHILE, AND, OR, TRUE, FALSE, NIL, CLASS, THIS, SUPER,
     VAR, FUN, PRINT,
 
     END_OF_FILE
 };
 
-struct token{
+struct token {
     const token_type type;
     const std::string lexeme;
     const literal_type literal;
     const int line;
 
-    token(token_type type, std::string lexeme, literal_type literal, int line): type(type), lexeme(lexeme), literal(literal), line(line) {};
+    token(token_type type, std::string lexeme, literal_type literal, int line) : type(type), lexeme(lexeme),
+                                                                                 literal(literal), line(line) {};
+
+    bool operator==(const token &other) const {
+        return type == other.type;
+    }
 };
 
 #endif //CPPLOX_TOKEN_H

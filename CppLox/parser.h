@@ -11,10 +11,11 @@ private:
     int current = 0;
     expression root;
 
-    bool match(std::vector<token> tokens);
+    bool match(const std::vector<token_type>& token_list);
     bool is_current_at_end();
     token get_previous_token();
 
+    expression parse_expression();
     expression equality();
     expression comparision();
     expression term();
