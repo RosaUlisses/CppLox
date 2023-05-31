@@ -95,6 +95,16 @@ void lexer::scan_token() {
             current++;
             break;
 
+        case '?' :
+            add_token(INTERROGATION);
+            current++;
+            break;
+
+        case ':' :
+            add_token(COLON);
+            current++;
+            break;
+
         case '=' :
             if (source[current + 1] == '=') {
                 current += 2;

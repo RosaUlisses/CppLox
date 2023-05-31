@@ -19,13 +19,14 @@ public:
 private:
     std::vector<token> tokens;
     int current = 0;
-    expression root;
+    bool had_error = false;
 
-    bool match(const std::vector<token_type>& token_list);
+    bool match(const std::vector<token_type>& token_types);
     bool is_current_at_end();
     token get_previous_token();
 
     expression parse_expression();
+    expression ternary();
     expression equality();
     expression comparision();
     expression term();

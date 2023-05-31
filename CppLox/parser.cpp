@@ -10,12 +10,25 @@ expression parser::parse() {
     try {
         return parse_expression();
     } catch(parse_error& error) {
+        had_error = true;
         return {};
     } 
 }
 
 expression parser::parse_expression() {
-    return equality();
+    return ternary();
+}
+
+expression parser::ternary() {
+    auto expression = equality();
+    if (match({INTERROGATION})) {
+        auto left_expression = ternary();
+        consume(COLON, "Expect ':' in a ternary expression.");
+        auto right_expression = ternary();
+        expression = ternary_expression(expression, left_expression, right_expression);
+    }
+    
+    return expression;
 }
 
 expression parser::equality() {
@@ -105,8 +118,8 @@ parser::parse_error parser::generate_parse_error(token token, std::string mensag
     return parse_error();
 }
 
-bool parser::match(const std::vector<token_type>& token_list) {
-    bool result = std::any_of(token_list.begin(), token_list.end(), [&](const token_type& t){return tokens[current].type == t;});
+bool parser::match(const std::vector<token_type>& token_types) {
+    bool result = std::any_of(token_types.begin(), token_types.end(), [&](const token_type& t){return tokens[current].type == t;});
     current++;
     return result;
 }
