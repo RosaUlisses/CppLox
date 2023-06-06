@@ -203,7 +203,7 @@ void lexer::scan_number() {
     add_token(NUMBER, number);
 }
 
-void lexer::add_token(token_type type, literal_type literal) {
+void lexer::add_token(token_type type, lox_value literal) {
     std::string lexeme = source.substr(start, current == start ? 1 : current - start);
     tokens.push_back(token(type, lexeme, literal, line));
 }

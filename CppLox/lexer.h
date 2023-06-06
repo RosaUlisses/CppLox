@@ -26,7 +26,7 @@ private:
     static void scan_string();
     static void scan_identifier();
     static void scan_number();
-    static void add_token(token_type type, literal_type literal = "");
+    static void add_token(token_type type, lox_value literal = "");
 };
 
 #endif

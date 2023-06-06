@@ -4,7 +4,15 @@
 #include <string>
 #include <variant>
 
-typedef std::variant<double, std::string, void*> literal_type;
+class lox_types {
+public:
+    static constexpr int DOUBLE = 0;
+    static constexpr int STRING = 1;
+    static constexpr int BOOL = 2;
+    static constexpr int REFERENCE = 3;
+};
+
+typedef std::variant<double, std::string, bool, void*> lox_value;
 
 enum token_type {
 
@@ -30,11 +38,11 @@ enum token_type {
 struct token {
     const token_type type;
     const std::string lexeme;
-    const literal_type literal;
+    const lox_value literal;
     const int line;
 
-    token(token_type type, std::string lexeme, literal_type literal, int line) : type(type), lexeme(lexeme),
-                                                                                 literal(literal), line(line) {};
+    token(token_type type, std::string lexeme, lox_value literal, int line) : type(type), lexeme(lexeme),
+                                                                              literal(literal), line(line) {};
 
     bool operator==(const token &other) const {
         return type == other.type;
