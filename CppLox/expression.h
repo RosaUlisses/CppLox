@@ -34,9 +34,9 @@ public:
     const std::unique_ptr<expression> left;
     const std::unique_ptr<expression> right;
 
-    ternary_expression(expression* condition, expression* left, expression* right) : condition(condition), 
-                                                                                  left(left),
-                                                                                  right(right) {};
+    ternary_expression(std::unique_ptr<expression>& condition, std::unique_ptr<expression>& left, std::unique_ptr<expression>& right) : condition(std::move(condition)), 
+                                                                                  left(std::move(left)),
+                                                                                  right(std::move(right)) {};
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_ternary_expression(*this);
     }
@@ -48,9 +48,9 @@ public:
     const token operator_;
     const std::unique_ptr<expression> right;
 
-    binary_expression(expression* left, token operator_, expression* right) : left(left),
+    binary_expression(std::unique_ptr<expression>& left, token operator_, std::unique_ptr<expression>& right) : left(std::move(left)),
                                                                             operator_(operator_),
-                                                                            right(right) {
+                                                                            right(std::move(right)) {
     };
 
     lox_value accept(expression_visitor* visitor) override {
@@ -64,8 +64,8 @@ public:
     const token operator_;
     const std::unique_ptr<expression> right;
 
-    unary_expression(token operator_, expression* right) : operator_(operator_),
-                                                           right(right) {};
+    unary_expression(token operator_, std::unique_ptr<expression>& right) : operator_(operator_),
+                                                           right(std::move(right)) {};
     
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_unary_expression(*this);
@@ -76,7 +76,7 @@ class grouping_expression : public expression {
 public:
     const std::unique_ptr<expression> expr;
 
-    grouping_expression(expression* expr) : expr(expr) {};
+    grouping_expression(std::unique_ptr<expression>& expr) : expr(std::move(expr)) {};
 
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_grouping_expression(*this);
@@ -101,7 +101,7 @@ public:
     var_expression(token name) : name(name) {};
 
     lox_value accept(expression_visitor* visitor) override {
-        return visitor->visit_literal_expression(*this);
+        return visitor->visit_var_expression(*this);
     }
 };
 

@@ -15,7 +15,7 @@ public:
         parse_error();
     };
     parser(std::vector<token> tokens);
-    std::vector<statement*> parse();
+    std::unique_ptr<expression> parse();
 
 private:
     std::vector<token> tokens;
@@ -28,15 +28,15 @@ private:
     statement* expression_stmt();
     
     
-    expression* parse_expression();
-    expression* ternary();
-    expression* equality();
-    expression* comparision();
-    expression* term();
-    expression* factor();
-    expression* unary();
-    expression* primary();
-    expression* variable();
+    std::unique_ptr<expression> parse_expression();
+    std::unique_ptr<expression> ternary();
+    std::unique_ptr<expression> equality();
+    std::unique_ptr<expression> comparision();
+    std::unique_ptr<expression> term();
+    std::unique_ptr<expression> factor();
+    std::unique_ptr<expression> unary();
+    std::unique_ptr<expression> primary();
+    std::unique_ptr<expression> variable();
 
     bool match(const std::vector<token_type>& token_types);
     bool is_current_at_end();

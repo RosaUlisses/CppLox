@@ -6,13 +6,13 @@ parser::parser(std::vector<token> tokens): tokens(tokens) {}
 
 parser::parse_error::parse_error() : std::runtime_error("") {}
 
-std::vector<statement*> parser::parse() {
-    std::vector<statement*> statements;
-    while(!is_current_at_end()) {
-        statements.push_back(parse_statement()); 
+std::unique_ptr<expression> parser::parse() {
+    try {
+        return parse_expression();
     }
-    
-    return statements;
+    catch (parse_error& error) {
+        
+    }
 }
 
 statement* parser::parse_statement() {
@@ -33,97 +33,97 @@ statement* parser::expression_stmt() {
     return new expression_statement(expression);
 }
 
-expression* parser::parse_expression() {
+std::unique_ptr<expression> parser::parse_expression() {
     return ternary();
 }
 
-expression* parser::ternary() {
-    auto expression = equality();
+std::unique_ptr<expression> parser::ternary() {
+    auto expr = equality();
     if (match({INTERROGATION})) {
         auto left_expression = ternary();
         consume(COLON, "Expect ':' in a ternary expression.");
         auto right_expression = ternary();
-        expression = new ternary_expression(expression, left_expression, right_expression);
+        expr = std::unique_ptr<expression>(new ternary_expression(expr, left_expression, right_expression));
     }
     
-    return expression;
+    return expr;
 }
 
-expression* parser::equality() {
-    auto expression = comparision();
+std::unique_ptr<expression> parser::equality() {
+    auto expr = comparision();
     while (match({EQUAL_EQUAL, BANG_EQUAL})) {
        token operator_ = get_previous_token(); 
-       auto right = comparision(); 
-       expression = new binary_expression(expression, operator_, right);
+       auto right = comparision();
+        expr = std::unique_ptr<expression>(new binary_expression(expr, operator_, right));
     }
     
-    return expression;
+    return expr;
 }
 
-expression* parser::comparision() {
-    auto expression = term();
+std::unique_ptr<expression> parser::comparision() {
+    auto expr = term();
     while (match({GREATER, GREATER_EQUAL, LESS, LESS_EQUAL})) {
         token operator_ = get_previous_token();
         auto right = term();
-        expression = new binary_expression(expression, operator_, right);
+        expr = std::unique_ptr<expression>(new binary_expression(expr, operator_, right));
     }
 
-    return expression;   
+    return expr;   
 }
 
-expression* parser::term() {
-    auto expression = factor();
+std::unique_ptr<expression> parser::term() {
+    auto expr = factor();
     while (match({PLUS, MINUS})) {
         token operator_ = get_previous_token();
         auto right = term();
-        expression = new binary_expression(expression, operator_, right);
+        expr = std::unique_ptr<expression>(new binary_expression(expr, operator_, right));
     }
 
-    return expression;
+    return expr;
 }
 
-expression* parser::factor() {
-    auto expression = unary();
+std::unique_ptr<expression> parser::factor() {
+    std::unique_ptr<expression> expr = unary();
     while (match({STAR, SLASH})) {
         token operator_ = get_previous_token();
         auto right = term();
-        expression = new binary_expression(expression, operator_, right);
+        expr = std::unique_ptr<expression>(new binary_expression(expr, operator_, right));
     }
 
-    return expression;
+    return expr;
 }
 
-expression* parser::unary() {
+std::unique_ptr<expression> parser::unary() {
     if (match({BANG, MINUS})) {
         token operator_ = get_previous_token(); 
         auto right = unary();
-        return new unary_expression(operator_, right);
+        return std::unique_ptr<expression>(new unary_expression(operator_, right));
     }
     
     return primary();
 }
 
-expression* parser::primary() {
-    if (match({TRUE})) return new literal_expression(true);
-    if (match({FALSE})) return new literal_expression(false);
-    if (match({NIL})) return new literal_expression(nullptr);
+std::unique_ptr<expression> parser::primary() {
+    if (match({TRUE})) return std::unique_ptr<expression>(new literal_expression(true));
+    if (match({FALSE})) return std::unique_ptr<expression>(new literal_expression(false));
+    if (match({NIL})) return std::unique_ptr<expression>(new literal_expression(nullptr));
 
     if (match({NUMBER, STRING})) {
-        return new literal_expression(get_previous_token().literal);
+        return std::unique_ptr<expression>(new literal_expression(get_previous_token().literal));
     }
 
     if (match({IDENTIFIER})) {}
 
     if (match({LEFT_PARENTESIS})) {
-        auto expression = parse_expression();
+        auto expr = parse_expression();
         consume(RIGHT_PARENTESIS, "Expect ')' after expression.");
-        return new grouping_expression(expression);
+        return std::unique_ptr<expression>(new grouping_expression(expr));
     }
     
     throw generate_parse_error(tokens[current], "Expect expression.");
 }
 
-expression *parser::variable() {
+std::unique_ptr<expression> parser::variable() {
     return nullptr;
 }
 
@@ -168,9 +168,3 @@ bool parser::is_current_at_end() {
 token parser::get_previous_token() {
     return tokens[current - 1];
 }
-
-
-
-
-
-

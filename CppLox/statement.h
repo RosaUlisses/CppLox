@@ -23,29 +23,29 @@ public:
 
 class print_statement : public statement {
 public:
-    print_statement(std::unique_ptr<expression> expr) : expr(std::move(expr)) {}
+    print_statement(std::unique_ptr<expression>& expr) : expr(std::move(expr)) {}
     
     void accept(statement_visitor* visitor) override {
         visitor->visit_print_statement(*this);
     }
     
-   std::unique_ptr<expression> expr; 
+   const std::unique_ptr<expression> expr; 
 };
 
 class expression_statement : public statement {
 public:
-    expression_statement(std::unique_ptr<expression> expr) : expr(std::move(expr)) {}
+    expression_statement(std::unique_ptr<expression>& expr) : expr(std::move(expr)) {}
     
     void accept(statement_visitor* visitor) override {
         visitor->visit_expression_statement(*this);
     }
 
-    std::unique_ptr<expression> expr;
+    const std::unique_ptr<expression> expr;
 };
 
 class var_statement : public statement {
 public:
-    var_statement(token name, std::unique_ptr<expression> initializer) : name(name), initializer(std::move(initializer)) {}
+    var_statement(token name, std::unique_ptr<expression>& initializer) : name(name), initializer(std::move(initializer)) {}
 
     void accept(statement_visitor* visitor) override {
         visitor->visit_var_statement(*this);

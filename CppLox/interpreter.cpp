@@ -7,7 +7,7 @@ interpreter::runtime_error::runtime_error(token token_, const std::string &messa
 
 void interpreter::interpret() {
    try {
-       lox_value value = evaluate(std::unique_ptr<expression>(root));
+       lox_value value = evaluate(root);
        std::cout << to_string(value);
    } 
    catch(runtime_error& error) {
@@ -161,6 +161,13 @@ void interpreter::check_number_operand(token token_, const lox_value& value) {
     if (value.index() != lox_types::DOUBLE) {
         throw runtime_error(token_, "Operand must be a number.");
     }
+}
+
+lox_value interpreter::visit_var_expression(const var_expression &expression) {
+    return lox_value();
+}
+
+void interpreter::visit_var_statement(const var_statement &statement) {
 }
 
 
