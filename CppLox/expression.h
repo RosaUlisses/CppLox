@@ -9,6 +9,7 @@ class binary_expression;
 class unary_expression;
 class grouping_expression;
 class literal_expression;
+class var_expression;
 
 class expression_visitor {
 public:
@@ -17,6 +18,7 @@ public:
     virtual lox_value visit_unary_expression(const unary_expression& expression) = 0;
     virtual lox_value visit_grouping_expression(const grouping_expression& expression) = 0;
     virtual lox_value visit_literal_expression(const literal_expression& expression) = 0;
+    virtual lox_value visit_var_expression(const var_expression& expression) = 0;
     expression_visitor() {}
 };
 
@@ -86,6 +88,17 @@ public:
     const lox_value value;
 
     literal_expression(lox_value literal) : value(literal) {};
+
+    lox_value accept(expression_visitor* visitor) override {
+        return visitor->visit_literal_expression(*this);
+    }
+};
+
+class var_expression : public expression {
+public:
+    const token name;
+
+    var_expression(token name) : name(name) {};
 
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_literal_expression(*this);

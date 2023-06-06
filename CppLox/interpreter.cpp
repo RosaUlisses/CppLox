@@ -19,11 +19,22 @@ void interpreter::report_runtime_error(const interpreter::runtime_error &error) 
     std::cerr << error.what() << "\n[line " << error.token_.line << "]";
 }
 
+void interpreter::execute(const std::unique_ptr<statement>& statement) {
+    statement->accept(this);
+}
+
+void interpreter::visit_print_statement(const print_statement& statement) {
+    lox_value value = evaluate(statement.expr);   
+    std::cout << to_string(value);
+}
+
+void interpreter::visit_expression_statement(const expression_statement& statement) {
+    evaluate(statement.expr); 
+}
+
 lox_value interpreter::evaluate(const std::unique_ptr<expression>& expression) {
     return expression->accept(this);
 }
-
-
 
 lox_value interpreter::visit_ternary_expression(const ternary_expression& expression) {
     lox_value left = evaluate(expression.left);
@@ -151,3 +162,5 @@ void interpreter::check_number_operand(token token_, const lox_value& value) {
         throw runtime_error(token_, "Operand must be a number.");
     }
 }
+
+

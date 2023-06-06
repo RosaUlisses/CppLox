@@ -6,13 +6,31 @@ parser::parser(std::vector<token> tokens): tokens(tokens) {}
 
 parser::parse_error::parse_error() : std::runtime_error("") {}
 
-expression* parser::parse() {
-    try {
-        return parse_expression();
-    } catch(parse_error& error) {
-        had_error = true;
-        return {};
-    } 
+std::vector<statement*> parser::parse() {
+    std::vector<statement*> statements;
+    while(!is_current_at_end()) {
+        statements.push_back(parse_statement()); 
+    }
+    
+    return statements;
+}
+
+statement* parser::parse_statement() {
+    if (match({PRINT})) return print_stmt();
+    
+    return expression_stmt();
+}
+
+statement* parser::print_stmt() {
+    auto expression = parse_expression();
+    consume(SEMICOLON, "Expect ';' after value.");
+    return new print_statement(expression);
+}
+
+statement* parser::expression_stmt() {
+    auto expression = parse_expression();
+    consume(SEMICOLON, "Expect ';' after value.");
+    return new expression_statement(expression);
 }
 
 expression* parser::parse_expression() {
@@ -94,6 +112,8 @@ expression* parser::primary() {
         return new literal_expression(get_previous_token().literal);
     }
 
+    if (match({IDENTIFIER})) {}
+
     if (match({LEFT_PARENTESIS})) {
         auto expression = parse_expression();
         consume(RIGHT_PARENTESIS, "Expect ')' after expression.");
@@ -101,6 +121,10 @@ expression* parser::primary() {
     }
     
     throw generate_parse_error(tokens[current], "Expect expression.");
+}
+
+expression *parser::variable() {
+    return nullptr;
 }
 
 void parser::consume(token_type type, std::string mensage) {
@@ -144,3 +168,9 @@ bool parser::is_current_at_end() {
 token parser::get_previous_token() {
     return tokens[current - 1];
 }
+
+
+
+
+
+

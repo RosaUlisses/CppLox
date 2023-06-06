@@ -13,14 +13,18 @@ std::string get_source_code() {
     return buffer.str();
 }
 
-int main() {
+int get(std::unique_ptr<int>& ptr) {
+    return *ptr;
+}
 
+int main() {
     std::string source = get_source_code();
     std::vector<token> tokens = lexer::scan_tokens(source);
-    parser parser(tokens);
-    auto expression = parser.parse();
-    interpreter intepreter(expression);
-    intepreter.interpret();
+//    interpreter intepreter(parser(tokens).parse());
+//    intepreter.interpret();
+
+    std::unique_ptr<int> myptr = std::make_unique<int>(2);
+    int x = get(myptr);
 
     return 0;
 }

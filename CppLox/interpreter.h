@@ -3,9 +3,10 @@
 
 #include <stdexcept>
 #include "expression.h"
+#include "statement.h"
 
 
-class interpreter : public expression_visitor {
+class interpreter : public expression_visitor, statement_visitor {
 public:
     interpreter(expression* root): root(root) {}
     void interpret();
@@ -18,7 +19,11 @@ public:
 private:
     expression* root;
 
-    static void report_runtime_error(const interpreter::runtime_error& error); 
+    static void report_runtime_error(const interpreter::runtime_error& error);
+
+    void interpreter::execute(const std::unique_ptr<statement>& statement);
+    void visit_print_statement(const print_statement& statement) override;
+    void visit_expression_statement(const expression_statement& statement) override;
     
     lox_value evaluate(const std::unique_ptr<expression>& expression);
    
