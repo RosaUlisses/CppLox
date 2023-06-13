@@ -1,26 +1,89 @@
 #include <iostream>
+#include <memory>
 #include "interpreter.h"
-
-interpreter::runtime_error::runtime_error(token token_, const std::string &message) : token_(token_), std::runtime_error(message) {
-}
-
 
 void interpreter::interpret() {
    try {
-       lox_value value = evaluate(root);
-       std::cout << to_string(value);
+       for (auto const& statement : statements) {
+           execute(statement); 
+       }
    } 
    catch(runtime_error& error) {
        report_runtime_error(error);
    }
 }
 
-void interpreter::report_runtime_error(const interpreter::runtime_error &error) {
+void interpreter::report_runtime_error(runtime_error &error) {
     std::cerr << error.what() << "\n[line " << error.token_.line << "]";
 }
 
 void interpreter::execute(const std::unique_ptr<statement>& statement) {
     statement->accept(this);
+}
+
+void interpreter::visit_var_statement(const var_declaration_statement& statement) {
+    if (statement.initializer == nullptr) {
+        env->declare(statement.name);
+    } 
+    
+   env->declare(statement.name, evaluate(statement.initializer)); 
+}
+
+void interpreter::visit_block_statement(const block_statement& statement) {
+    if (should_break || should_continue) return; 
+    
+    std::unique_ptr<enviroment> previous = std::move(env);
+    env = std::make_unique<enviroment>(previous.get());
+    
+    for (auto const& stmt : statement.statements) {
+        if (typeid(*stmt) == typeid(continue_statement)) {
+            should_continue = true;
+            return;
+        }
+        if (typeid(*stmt) == typeid(break_statement)) {
+            should_break = true;
+            return;
+        }
+        
+        execute(stmt); 
+    }
+     
+    env = std::move(previous); 
+}
+
+void interpreter::visit_if_statement(const if_statement& statement) {
+    if (is_truthy(evaluate(statement.expr))) {
+        execute(statement.then_branch);
+        return;
+    }
+
+    if (statement.else_branch) {
+        execute(statement.else_branch);
+    }
+}
+
+void interpreter::visit_while_statement(const while_statement& statement) {
+    while (is_truthy(evaluate(statement.expr))) {
+        if (typeid(*(statement.body)) == typeid(continue_statement)) continue;
+        if (typeid(*(statement.body)) == typeid(break_statement)) break;
+        execute(statement.body);
+        if (should_continue) {
+            should_continue = false;
+        } 
+        
+        if (should_break) {
+            should_break = false;
+            break;
+        }
+    }
+}
+
+void interpreter::visit_continue_statement(const continue_statement& statement) {
+   should_continue = true; 
+}
+
+void interpreter::visit_break_statement(const break_statement& statement) {
+    should_break = true; 
 }
 
 void interpreter::visit_print_statement(const print_statement& statement) {
@@ -34,6 +97,10 @@ void interpreter::visit_expression_statement(const expression_statement& stateme
 
 lox_value interpreter::evaluate(const std::unique_ptr<expression>& expression) {
     return expression->accept(this);
+}
+
+lox_value interpreter::visit_assignment_expression(const assignment_expression& expression) {
+    return env->assign(expression.name, evaluate(expression.value));
 }
 
 lox_value interpreter::visit_ternary_expression(const ternary_expression& expression) {
@@ -51,6 +118,12 @@ lox_value interpreter::visit_binary_expression(const binary_expression& expressi
    lox_value right = evaluate(expression.right);
 
     switch (expression.operator_.type) {
+        case OR:
+            return is_truthy(left) || is_truthy(right);
+
+        case AND:
+            return is_truthy(left) && is_truthy(right);
+        
         case PLUS:
             check_number_or_string_operands(expression.operator_, left, right);
             if (left.index() == lox_types::DOUBLE) return std::get<double>(left) + std::get<double>(right);
@@ -66,6 +139,9 @@ lox_value interpreter::visit_binary_expression(const binary_expression& expressi
 
         case SLASH:
             check_number_operands(expression.operator_, left, right);
+            if (std::get<double>(right) == 0) {
+                throw runtime_error(expression.operator_, "Invalid division, dividing a number by 0.");
+            } 
             return std::get<double>(left) / std::get<double>(right);
 
 
@@ -116,6 +192,10 @@ lox_value interpreter::visit_literal_expression(const literal_expression& expres
     return expression.value;
 }
 
+lox_value interpreter::visit_var_expression(const variable_expression& expression) {
+    return env.get(expression.name);
+}
+
 std::string interpreter::to_string(const lox_value &value) {
     switch (value.index()) {
         case lox_types::STRING:
@@ -163,11 +243,14 @@ void interpreter::check_number_operand(token token_, const lox_value& value) {
     }
 }
 
-lox_value interpreter::visit_var_expression(const var_expression &expression) {
-    return lox_value();
-}
 
-void interpreter::visit_var_statement(const var_statement &statement) {
-}
+
+
+
+
+
+
+
+
 
 

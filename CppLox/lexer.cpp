@@ -5,6 +5,8 @@ std::unordered_map<std::string, token_type> lexer::key_words = {
         {"else",  ELSE},
         {"for",   FOR},
         {"while", WHILE},
+        {"break", BREAK},
+        {"continue", CONTINUE},
         {"and",   AND},
         {"or",    OR},
         {"true",  TRUE},

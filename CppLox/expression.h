@@ -4,28 +4,42 @@
 #include "token.h"
 #include <memory>
 
+class assignment_expression;
 class ternary_expression;
 class binary_expression;
 class unary_expression;
 class grouping_expression;
 class literal_expression;
-class var_expression;
+class variable_expression;
 
 class expression_visitor {
 public:
+    virtual lox_value visit_assignment_expression(const assignment_expression& expression) = 0;
     virtual lox_value visit_ternary_expression(const ternary_expression& expression) = 0;
     virtual lox_value visit_binary_expression(const binary_expression& expression) = 0;
     virtual lox_value visit_unary_expression(const unary_expression& expression) = 0;
     virtual lox_value visit_grouping_expression(const grouping_expression& expression) = 0;
     virtual lox_value visit_literal_expression(const literal_expression& expression) = 0;
-    virtual lox_value visit_var_expression(const var_expression& expression) = 0;
-    expression_visitor() {}
+    virtual lox_value visit_var_expression(const variable_expression& expression) = 0;
 };
 
 
 class expression {
 public:
     virtual lox_value accept(expression_visitor* visitor) = 0; 
+};
+
+class assignment_expression : public expression {
+public:
+    const token name;
+    const std::unique_ptr<expression> value;
+
+    assignment_expression(token name, std::unique_ptr<expression>& value) : name(name), value(std::move(value)) {
+    };
+
+    lox_value accept(expression_visitor* visitor) override {
+        visitor->visit_assignment_expression(*this);
+    }
 };
 
 class ternary_expression : public expression {
@@ -94,11 +108,11 @@ public:
     }
 };
 
-class var_expression : public expression {
+class variable_expression : public expression {
 public:
     const token name;
 
-    var_expression(token name) : name(name) {};
+    variable_expression(token name) : name(name) {};
 
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_var_expression(*this);
