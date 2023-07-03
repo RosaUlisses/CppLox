@@ -2,11 +2,15 @@
 #define CPPLOX_INTERPRETER_H
 
 #include <stdexcept>
+#include <iostream>
+#include <algorithm>
+#include <memory>
 #include <vector>
 #include "expression.h"
 #include "statement.h"
 #include "error.h"
 #include "enviroment.h"
+#include "lox_value.h"
 
 
 class interpreter : public expression_visitor, public statement_visitor {
@@ -39,6 +43,7 @@ private:
     lox_value visit_ternary_expression(const ternary_expression& expression) override;
     lox_value visit_binary_expression(const binary_expression& expression) override;
     lox_value visit_unary_expression(const unary_expression& expression) override;
+    lox_value visit_call_expression(const call_expression& expression) override;
     lox_value visit_grouping_expression(const grouping_expression& expression) override;
     lox_value visit_literal_expression(const literal_expression& expression) override;
     lox_value visit_var_expression(const variable_expression& expression) override;

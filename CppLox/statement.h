@@ -28,42 +28,50 @@ public:
 class statement {
 public:
     virtual void accept(statement_visitor* visitor) = 0;
+    virtual ~statement() = default;
 };
 
 class var_declaration_statement : public statement {
 public:
+    token name;
+    std::unique_ptr<expression> initializer;
+    
     var_declaration_statement(token name, std::unique_ptr<expression>& initializer) : name(name), initializer(std::move(initializer)) {}
 
     void accept(statement_visitor* visitor) override {
         visitor->visit_var_statement(*this);
     }
 
-    token name;
-    std::unique_ptr<expression> initializer;
+    ~var_declaration_statement() override = default;
 };
 
 class block_statement : public statement {
 public:
+    const std::vector<std::unique_ptr<statement>> statements;
+    
     block_statement(std::vector<std::unique_ptr<statement>>& statements) : statements(std::move(statements)) {}
 
     void accept(statement_visitor* visitor) override {
         visitor->visit_block_statement(*this);
     }
 
-    const std::vector<std::unique_ptr<statement>> statements;
+
+    ~block_statement() override = default;
 };
 
 class if_statement : public statement {
 public:
+    const std::unique_ptr<expression> expr;
+    const std::unique_ptr<statement> then_branch;
+    const std::unique_ptr<statement> else_branch;
+    
     if_statement(std::unique_ptr<expression>& expr, std::unique_ptr<statement>& then_branch, std::unique_ptr<statement>& else_branch) : expr(std::move(expr)), then_branch(std::move(then_branch)), else_branch(std::move(else_branch)) {}
     
     void accept(statement_visitor* visitor) {
        visitor->visit_if_statement(*this); 
     }
-    
-    const std::unique_ptr<expression> expr;
-    const std::unique_ptr<statement> then_branch;
-    const std::unique_ptr<statement> else_branch;
+
+    ~if_statement() override = default;
 };
 
 class while_statement : public statement {
@@ -86,6 +94,7 @@ public:
         visitor->visit_continue_statement(*this);
     }
 
+    ~continue_statement() override = default;
 };
 
 class break_statement : public statement {
@@ -96,29 +105,34 @@ public:
         visitor->visit_break_statement(*this);
     }
 
+    ~break_statement() override = default;
 };
 
 
 class print_statement : public statement {
 public:
+    const std::unique_ptr<expression> expr;
+    
     print_statement(std::unique_ptr<expression>& expr) : expr(std::move(expr)) {}
     
     void accept(statement_visitor* visitor) override {
         visitor->visit_print_statement(*this);
     }
     
-   const std::unique_ptr<expression> expr; 
+    ~print_statement() override = default;
 };
 
 class expression_statement : public statement {
 public:
+    const std::unique_ptr<expression> expr;
+    
     expression_statement(std::unique_ptr<expression>& expr) : expr(std::move(expr)) {}
     
     void accept(statement_visitor* visitor) override {
         visitor->visit_expression_statement(*this);
     }
 
-    const std::unique_ptr<expression> expr;
+    ~expression_statement() override = default;
 };
 
 

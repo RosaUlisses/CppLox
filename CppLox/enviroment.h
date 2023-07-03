@@ -18,7 +18,7 @@ public:
     }
     
     void declare(const token& name) {
-        values.insert({name.lexeme, nullptr});
+        values.insert({name.lexeme, static_cast<void*>(nullptr)});
     }
     
     bool variable_declared(const token& name) {
@@ -32,7 +32,7 @@ public:
     lox_value get(const token& name) {
         if (variable_declared(name)) {
             if (variable_not_assigned(name)) {
-                throw runtime_error(name, "Accessing unassigned variable '" + name.lexeme + "'".)
+                throw runtime_error(name, "Accessing unassigned variable '" + name.lexeme + "'.");
             }
             return values[name.lexeme];
         }

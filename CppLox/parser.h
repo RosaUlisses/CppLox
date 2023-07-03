@@ -22,6 +22,7 @@ private:
     int current = 0;
     bool had_error = false;
     bool parsing_loop = false;
+    static constexpr int MAX_ARGUMENT_COUNT = 255;
 
     
     std::unique_ptr<statement> declaration_stmt();
@@ -47,6 +48,8 @@ private:
     std::unique_ptr<expression> term();
     std::unique_ptr<expression> factor();
     std::unique_ptr<expression> unary();
+    std::unique_ptr<expression> call();
+    std::unique_ptr<expression> finish_call(std::unique_ptr<expression>& expr);
     std::unique_ptr<expression> primary();
     std::unique_ptr<expression> variable();
 

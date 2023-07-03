@@ -285,10 +285,40 @@ std::unique_ptr<expression> parser::unary() {
     return primary();
 }
 
+std::unique_ptr<expression> parser::call() {
+    std::unique_ptr<expression> expr = primary();
+
+    while (true) {
+        if (match({LEFT_PARENTESIS})) {
+            expr = finish_call(expr);
+        }
+        else break;
+    }
+    
+    return expr;
+}
+
+std::unique_ptr<expression> parser::finish_call(std::unique_ptr<expression>& expr) {
+    std::vector<std::unique_ptr<expression>> arguments;
+
+    if (tokens[current].type != RIGHT_PARENTESIS) {
+        do {
+            if (arguments.size() >= parser::MAX_ARGUMENT_COUNT) {
+                report_parsing_error(tokens[current], "Can not have more than " + std::to_string(parser::MAX_ARGUMENT_COUNT) + "arguments.");
+            }
+            arguments.push_back(parse_expression());
+        } while(match({COMMA}));
+    }
+
+    token parenthesis = consume(RIGHT_PARENTESIS, "Expect ')' after arguments.");
+
+    return std::unique_ptr<expression>(nullptr);
+}
+
 std::unique_ptr<expression> parser::primary() {
     if (match({TRUE})) return std::unique_ptr<expression>(new literal_expression(true));
     if (match({FALSE})) return std::unique_ptr<expression>(new literal_expression(false));
-    if (match({NIL})) return std::unique_ptr<expression>(new literal_expression(nullptr));
+    if (match({NIL})) return std::unique_ptr<expression>(new literal_expression(static_cast<void*>(nullptr)));
 
     if (match({NUMBER, STRING})) {
         return std::unique_ptr<expression>(new literal_expression(get_previous_token().literal));
@@ -352,7 +382,3 @@ bool parser::is_current_at_end() {
 token parser::get_previous_token() {
     return tokens[current - 1];
 }
-
-
-
-

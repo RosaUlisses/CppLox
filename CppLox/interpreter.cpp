@@ -1,5 +1,3 @@
-#include <iostream>
-#include <memory>
 #include "interpreter.h"
 
 void interpreter::interpret() {
@@ -184,6 +182,26 @@ lox_value interpreter::visit_unary_expression(const unary_expression& expression
     return {}; 
 }
 
+lox_value interpreter::visit_call_expression(const call_expression& expression) {
+    lox_value callee = evaluate(expression.callee);
+    
+    std::vector<lox_value> arguments;
+    std::for_each(expression.arguments.begin(), expression.arguments.end(), [&](const auto& arg) { arguments.push_back(evaluate(arg)); });
+
+    if (callee.index() != lox_types::LOX_CALLABLE) {
+        throw runtime_error(expression.parenthesis, "Can only call functions and classes.");
+    }
+
+    lox_callable* function = std::get<lox_callable*>(callee);
+
+    if (arguments.size() != function->arity()) {
+        throw runtime_error(expression.parenthesis, "Expect " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments.size()) + " arguments.");
+    }
+    
+    return function->call(*this, arguments);
+}
+
+
 lox_value interpreter::visit_grouping_expression(const grouping_expression& expression) {
     return evaluate(expression.expr);
 }
@@ -193,7 +211,7 @@ lox_value interpreter::visit_literal_expression(const literal_expression& expres
 }
 
 lox_value interpreter::visit_var_expression(const variable_expression& expression) {
-    return env.get(expression.name);
+    return env->get(expression.name);
 }
 
 std::string interpreter::to_string(const lox_value &value) {
@@ -211,6 +229,8 @@ std::string interpreter::to_string(const lox_value &value) {
         case lox_types::REFERENCE:
             if (std::get<void*>(value) == nullptr) return "nil";
             return "reference";
+        case lox_types::LOX_CALLABLE:
+            return "function"; 
     } 
 }
 
@@ -242,15 +262,3 @@ void interpreter::check_number_operand(token token_, const lox_value& value) {
         throw runtime_error(token_, "Operand must be a number.");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-

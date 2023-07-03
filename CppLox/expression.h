@@ -2,12 +2,14 @@
 #define CPPLOX_EXPRESSION_H
 
 #include "token.h"
+#include "lox_value.h"
 #include <memory>
 
 class assignment_expression;
 class ternary_expression;
 class binary_expression;
 class unary_expression;
+class call_expression;
 class grouping_expression;
 class literal_expression;
 class variable_expression;
@@ -18,6 +20,7 @@ public:
     virtual lox_value visit_ternary_expression(const ternary_expression& expression) = 0;
     virtual lox_value visit_binary_expression(const binary_expression& expression) = 0;
     virtual lox_value visit_unary_expression(const unary_expression& expression) = 0;
+    virtual lox_value visit_call_expression(const call_expression& expression) = 0;
     virtual lox_value visit_grouping_expression(const grouping_expression& expression) = 0;
     virtual lox_value visit_literal_expression(const literal_expression& expression) = 0;
     virtual lox_value visit_var_expression(const variable_expression& expression) = 0;
@@ -27,6 +30,7 @@ public:
 class expression {
 public:
     virtual lox_value accept(expression_visitor* visitor) = 0; 
+    virtual ~expression()  = default;
 };
 
 class assignment_expression : public expression {
@@ -38,8 +42,10 @@ public:
     };
 
     lox_value accept(expression_visitor* visitor) override {
-        visitor->visit_assignment_expression(*this);
+        return visitor->visit_assignment_expression(*this);
     }
+    
+    ~assignment_expression() override = default;
 };
 
 class ternary_expression : public expression {
@@ -54,6 +60,8 @@ public:
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_ternary_expression(*this);
     }
+
+    ~ternary_expression() override = default;
 };
 
 class binary_expression : public expression {
@@ -70,6 +78,9 @@ public:
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_binary_expression(*this);
     }
+
+
+    ~binary_expression() override = default;
 };
 
 
@@ -84,7 +95,28 @@ public:
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_unary_expression(*this);
     }
+
+
+    ~unary_expression() override = default;
 };
+
+class call_expression : public expression {
+public:
+    const std::unique_ptr<expression> callee;
+    const token parenthesis;
+    const std::vector<std::unique_ptr<expression>> arguments;
+    
+    call_expression(std::unique_ptr<expression>& callee, token parenthesis, std::vector<std::unique_ptr<expression>>& arguments) : callee(std::move(callee)),
+                                                                                                                parenthesis(parenthesis), arguments(std::move(arguments)) {};
+    
+    lox_value accept(expression_visitor* visitor) override {
+       return visitor->visit_call_expression(*this);
+    }
+    
+    ~call_expression() override = default;
+};
+
+
 
 class grouping_expression : public expression {
 public:
@@ -95,6 +127,8 @@ public:
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_grouping_expression(*this);
     }
+
+    ~grouping_expression() override = default;
 };
 
 class literal_expression : public expression {
@@ -106,6 +140,8 @@ public:
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_literal_expression(*this);
     }
+
+    ~literal_expression() override = default;
 };
 
 class variable_expression : public expression {
@@ -117,6 +153,8 @@ public:
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_var_expression(*this);
     }
+
+    ~variable_expression() override = default;
 };
 
 #endif

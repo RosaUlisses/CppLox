@@ -3,16 +3,8 @@
 
 #include <string>
 #include <variant>
+#include "lox_value.h"
 
-class lox_types {
-public:
-    static constexpr int DOUBLE = 0;
-    static constexpr int STRING = 1;
-    static constexpr int BOOL = 2;
-    static constexpr int REFERENCE = 3;
-};
-
-typedef std::variant<double, std::string, bool, void*> lox_value;
 
 enum token_type {
 
