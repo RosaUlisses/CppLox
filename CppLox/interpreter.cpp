@@ -11,6 +11,10 @@ void interpreter::interpret() {
    }
 }
 
+enviroment *interpreter::get_global_enviroment() {
+    return global_env.get();
+}
+
 void interpreter::report_runtime_error(runtime_error &error) {
     std::cerr << error.what() << "\n[line " << error.token_.line << "]";
 }
@@ -19,12 +23,16 @@ void interpreter::execute(const std::unique_ptr<statement>& statement) {
     statement->accept(this);
 }
 
-void interpreter::visit_var_statement(const var_declaration_statement& statement) {
-    if (statement.initializer == nullptr) {
-        env->declare(statement.name);
-    } 
+void interpreter::visit_var_declaration_statement(const var_declaration_statement& statement) {
+    auto declare_variable = [&](std::unique_ptr<enviroment>& enviroment) {
+        if (statement.initializer == nullptr) {
+            enviroment->declare(statement.name);
+        }
+        enviroment->declare(statement.name, this->evaluate(statement.initializer));        
+    };  
     
-   env->declare(statement.name, evaluate(statement.initializer)); 
+    if (!env->has_enclosing()) declare_variable(global_env);
+    else declare_variable(global_env);
 }
 
 void interpreter::visit_block_statement(const block_statement& statement) {
@@ -211,6 +219,10 @@ lox_value interpreter::visit_literal_expression(const literal_expression& expres
 }
 
 lox_value interpreter::visit_var_expression(const variable_expression& expression) {
+    if (global_env->contains(expression.name)) {
+        return global_env->get(expression.name);
+    }
+    
     return env->get(expression.name);
 }
 
@@ -229,8 +241,12 @@ std::string interpreter::to_string(const lox_value &value) {
         case lox_types::REFERENCE:
             if (std::get<void*>(value) == nullptr) return "nil";
             return "reference";
+            
         case lox_types::LOX_CALLABLE:
-            return "function"; 
+            return "anonymous_function";
+            
+        default:
+            return "";
     } 
 }
 

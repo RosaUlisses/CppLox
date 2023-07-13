@@ -17,9 +17,9 @@ std::vector<std::unique_ptr<statement>> parser::parse() {
 
 std::unique_ptr<statement> parser::declaration_stmt() {
     try {
-        if (match({VAR})) {
-            return var_declaration_stmt();
-        }
+        if (match({VAR})) return var_declaration_stmt();
+        if (match({FN})) return function_declaration_stmt();
+        
 
         return parse_statement();
     }
@@ -28,6 +28,27 @@ std::unique_ptr<statement> parser::declaration_stmt() {
         // todo -> syncronize        
         return nullptr;
     }
+}
+
+std::unique_ptr<statement> parser::function_declaration_stmt() {
+    token name = consume(IDENTIFIER, "Expect anonymous_function/method name.");
+    consume(LEFT_PARENTESIS, "Expect '(' after ");
+   
+    std::vector<token> parameters;
+
+    do {
+        if (parameters.size() > parser::MAX_ARGUMENT_COUNT) {
+            report_parsing_error(tokens[current], "Can not have more than " + std::to_string(parser::MAX_ARGUMENT_COUNT) + "parameters.");
+        }
+        parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+    }while(match({COMMA}));
+
+    consume(SEMICOLON, "Expect ')' after parameters.");
+
+    consume(LEFT_BRACE, "Expect '{' before a function/method body.");
+    std::unique_ptr<statement> block = block_stmt();
+    
+    return std::unique_ptr<statement>(new function_declaration_statement(name, parameters, block));
 }
 
 std::unique_ptr<statement> parser::var_declaration_stmt() {
@@ -176,6 +197,9 @@ std::unique_ptr<expression> parser::parse_expression() {
     return assignment();
 }
 
+std::unique_ptr<expression> parser::anonymous_function() {
+}
+
 std::unique_ptr<expression> parser::assignment() {
     auto expr = ternary();
 
@@ -282,7 +306,7 @@ std::unique_ptr<expression> parser::unary() {
         return std::unique_ptr<expression>(new unary_expression(operator_, right));
     }
 
-    return primary();
+    return call();
 }
 
 std::unique_ptr<expression> parser::call() {
@@ -303,7 +327,7 @@ std::unique_ptr<expression> parser::finish_call(std::unique_ptr<expression>& exp
 
     if (tokens[current].type != RIGHT_PARENTESIS) {
         do {
-            if (arguments.size() >= parser::MAX_ARGUMENT_COUNT) {
+            if (arguments.size() > parser::MAX_ARGUMENT_COUNT) {
                 report_parsing_error(tokens[current], "Can not have more than " + std::to_string(parser::MAX_ARGUMENT_COUNT) + "arguments.");
             }
             arguments.push_back(parse_expression());
@@ -312,7 +336,7 @@ std::unique_ptr<expression> parser::finish_call(std::unique_ptr<expression>& exp
 
     token parenthesis = consume(RIGHT_PARENTESIS, "Expect ')' after arguments.");
 
-    return std::unique_ptr<expression>(nullptr);
+    return std::unique_ptr<expression>(new call_expression(expr, parenthesis, arguments));
 }
 
 std::unique_ptr<expression> parser::primary() {
@@ -376,7 +400,7 @@ bool parser::match(const std::vector<token_type> &token_types) {
 }
 
 bool parser::is_current_at_end() {
-    return current >= tokens.size();
+    return tokens[current].type == END_OF_FILE;
 }
 
 token parser::get_previous_token() {

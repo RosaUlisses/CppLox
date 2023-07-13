@@ -22,7 +22,7 @@ enum token_type {
 
     // Keywords
     IF, ELSE, WHILE, CONTINUE, BREAK, FOR, AND, OR, TRUE, FALSE, NIL, CLASS, THIS, SUPER,
-    VAR, FUN, PRINT,
+    VAR, FN, PRINT,
 
     END_OF_FILE
 };

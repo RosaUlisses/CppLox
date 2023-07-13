@@ -15,7 +15,7 @@ std::unordered_map<std::string, token_type> lexer::key_words = {
         {"this",  THIS},
         {"super", SUPER},
         {"var",   VAR},
-        {"fun",   FUN},
+        {"fn",   FN},
         {"print", PRINT}
 };
 std::string lexer::source = "";

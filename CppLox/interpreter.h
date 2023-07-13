@@ -11,24 +11,29 @@
 #include "error.h"
 #include "enviroment.h"
 #include "lox_value.h"
+#include "native_functions.h"
 
 
 class interpreter : public expression_visitor, public statement_visitor {
 public:
-    interpreter(std::vector<std::unique_ptr<statement>> &statements): statements(std::move(statements)), env(new enviroment()) {
+    interpreter(std::vector<std::unique_ptr<statement>> &statements): statements(std::move(statements)), env(new enviroment()), global_env(new enviroment()){
+        global_env->declare("clock", static_cast<lox_callable*>(new lox_clock())); 
     }
     void interpret();
+    enviroment* get_global_enviroment();
 
 private:
     std::unique_ptr<enviroment> env;
+    std::unique_ptr<enviroment> global_env;
     bool should_continue = false;
     bool should_break = false;
     const std::vector<std::unique_ptr<statement>> statements;
-
+    
     static void report_runtime_error(runtime_error& error);
 
     void execute(const std::unique_ptr<statement>& statement);
-    void visit_var_statement(const var_declaration_statement& statement) override;
+    void visit_function_declaration_statement(const function_declaration_statement& statement) override;
+    void visit_var_declaration_statement(const var_declaration_statement& statement) override;
     void visit_block_statement(const block_statement& statement) override;
     void visit_if_statement(const if_statement& statement) override;
     void visit_while_statement(const while_statement& statement) override;
@@ -36,6 +41,7 @@ private:
     void visit_break_statement(const break_statement& statement) override;
     void visit_print_statement(const print_statement& statement) override;
     void visit_expression_statement(const expression_statement& statement) override;
+    
     
     lox_value evaluate(const std::unique_ptr<expression>& expression);
    

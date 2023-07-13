@@ -27,6 +27,7 @@ private:
     
     std::unique_ptr<statement> declaration_stmt();
     std::unique_ptr<statement> block_stmt();
+    std::unique_ptr<statement> function_declaration_stmt(); 
     std::unique_ptr<statement> var_declaration_stmt();
     std::unique_ptr<statement> parse_statement();
     std::unique_ptr<statement> if_stmt();
@@ -39,6 +40,7 @@ private:
     
     
     std::unique_ptr<expression> parse_expression();
+    std::unique_ptr<expression> anonymous_function();
     std::unique_ptr<expression> assignment();
     std::unique_ptr<expression> ternary();
     std::unique_ptr<expression> logic_or();

@@ -2,7 +2,10 @@
 A interpreter for Lox programming language
 
 program                 →  declaration* EOF ; \
-delcaration             →  varDecl | statement ; \
+delcaration             →  funcDecl | varDecl | statement ; \
+funcDecl                →  "fn" anonymous_function ; \
+anonymous_function                →  IDENTIFIER "(" parameters* ")" block ; \
+parameters              →  IDENTIFIER ( "," IDENTIFIER )* ; \
 varDecl                 →  "var" IDENTIFIER ("=" expression)? ";" ; \
 statement               →  exprStmt | printStmt | ifStmt | whileStmt | continueStmt | breakStmt | forStmt ; \
 continueStmt            →  "continue" ";" ; \
@@ -22,5 +25,7 @@ equality                → comparison ( ( "!=" | "==" ) comparison )* ; \
 comparison              → term ( ( ">" | ">=" | "<" | "<=" ) term )* ; \
 term                    → factor ( ( "-" | "+" ) factor )* ; \
 factor                  → unary ( ( "/" | "*" ) unary )* ; \
-unary                   → ( "!" | "-" ) unary \ | primary ; \
+unary                   → ( "!" | "-" ) unary | call | primary ; \
+call                    → primary "(" parameters? ")" ; \
+parameters               → expression ( "," expression )* ;
 primary                 → NUMBER | STRING | "true" | "false" | "nil"| "(" expression ")" ; \

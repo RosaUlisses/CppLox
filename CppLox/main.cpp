@@ -4,7 +4,6 @@
 #include "lexer.h"
 #include "token.h"
 #include "parser.h"
-#include <stdlib.h>
 #include "interpreter.h"
 
 std::string get_source_code() {
@@ -14,19 +13,12 @@ std::string get_source_code() {
     return buffer.str();
 }
 
-
-
-
-
 int main() {
-//    std::string source = get_source_code();
-//    std::vector<token> tokens = lexer::scan_tokens(source);
-//    auto expr = parser(tokens).parse();
-//    interpreter intepreter(expr, <#initializer#>);
-//    intepreter.interpret();
+    std::string source = get_source_code();
+    std::vector<token> tokens = lexer::scan_tokens(source);
+    auto expr = parser(tokens).parse();
+    interpreter intepreter(expr);
+    intepreter.interpret();
 
-
-    
-    
     return 0;
 }

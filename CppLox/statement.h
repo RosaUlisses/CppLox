@@ -3,6 +3,7 @@
 
 #include "expression.h"
 
+class function_declaration_statement;
 class var_declaration_statement;
 class block_statement;
 class if_statement;
@@ -14,7 +15,8 @@ class expression_statement;
 
 class statement_visitor {
 public:
-   virtual void visit_var_statement(const var_declaration_statement& statement) = 0;
+   virtual void visit_function_declaration_statement(const function_declaration_statement& statement) = 0;
+   virtual void visit_var_declaration_statement(const var_declaration_statement& statement) = 0;
    virtual void visit_block_statement(const block_statement& statement) = 0;
    virtual void visit_if_statement(const if_statement& statement) = 0;
    virtual void visit_while_statement(const while_statement& statement) = 0;
@@ -31,15 +33,30 @@ public:
     virtual ~statement() = default;
 };
 
+class function_declaration_statement : public statement {
+public:
+    token name;
+    const std::vector<token> parameters;
+    const std::unique_ptr<statement> body;
+
+    function_declaration_statement(token name, std::vector<token>& parameters, std::unique_ptr<statement>& body) : name(name), parameters(parameters), body(std::move(body)) {}
+
+    void accept(statement_visitor* visitor) override {
+        visitor->visit_function_declaration_statement(*this);
+    }
+
+    ~function_declaration_statement() override = default;
+};
+
 class var_declaration_statement : public statement {
 public:
     token name;
-    std::unique_ptr<expression> initializer;
+    const std::unique_ptr<expression> initializer;
     
     var_declaration_statement(token name, std::unique_ptr<expression>& initializer) : name(name), initializer(std::move(initializer)) {}
 
     void accept(statement_visitor* visitor) override {
-        visitor->visit_var_statement(*this);
+        visitor->visit_var_declaration_statement(*this);
     }
 
     ~var_declaration_statement() override = default;
