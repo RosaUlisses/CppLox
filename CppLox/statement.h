@@ -35,7 +35,7 @@ public:
 
 class function_declaration_statement : public statement {
 public:
-    token name;
+    const token name;
     const std::vector<token> parameters;
     const std::unique_ptr<statement> body;
 

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include "lox_function.h"
 #include "expression.h"
 #include "statement.h"
 #include "error.h"
@@ -21,6 +22,7 @@ public:
     }
     void interpret();
     enviroment* get_global_enviroment();
+    void execute_function(const std::unique_ptr<statement>& body, std::unique_ptr<enviroment>& function_env);
 
 private:
     std::unique_ptr<enviroment> env;

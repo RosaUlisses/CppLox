@@ -9,7 +9,7 @@ parser::parse_error::parse_error() : std::runtime_error("") {}
 std::vector<std::unique_ptr<statement>> parser::parse() {
     std::vector<std::unique_ptr<statement>> statements;
     while (!is_current_at_end()) {
-        statements.push_back(parse_statement());
+        statements.push_back(declaration_stmt());
     }
 
     return statements;
@@ -36,14 +36,15 @@ std::unique_ptr<statement> parser::function_declaration_stmt() {
    
     std::vector<token> parameters;
 
-    do {
-        if (parameters.size() > parser::MAX_ARGUMENT_COUNT) {
-            report_parsing_error(tokens[current], "Can not have more than " + std::to_string(parser::MAX_ARGUMENT_COUNT) + "parameters.");
-        }
-        parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
-    }while(match({COMMA}));
-
-    consume(SEMICOLON, "Expect ')' after parameters.");
+    if (tokens[current].type != RIGHT_PARENTESIS) {
+        do {
+            if (parameters.size() > parser::MAX_ARGUMENT_COUNT) {
+                report_parsing_error(tokens[current], "Can not have more than " + std::to_string(parser::MAX_ARGUMENT_COUNT) + "parameters.");
+            }
+            parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+        }while(match({COMMA}));       
+    }
+    consume(RIGHT_PARENTESIS, "Expect ')' after parameters.");
 
     consume(LEFT_BRACE, "Expect '{' before a function/method body.");
     std::unique_ptr<statement> block = block_stmt();
@@ -176,7 +177,7 @@ std::unique_ptr<statement> parser::block_stmt() {
         statements.push_back(declaration_stmt());
     }
 
-    consume(LEFT_BRACE, "Expect '}' after block.");
+    consume(RIGHT_BRACE, "Expect '}' after block.");
 
     return std::unique_ptr<statement>(new block_statement(statements));
 }
@@ -197,8 +198,6 @@ std::unique_ptr<expression> parser::parse_expression() {
     return assignment();
 }
 
-std::unique_ptr<expression> parser::anonymous_function() {
-}
 
 std::unique_ptr<expression> parser::assignment() {
     auto expr = ternary();

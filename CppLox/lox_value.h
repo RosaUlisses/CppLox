@@ -23,6 +23,7 @@ class lox_callable {
 public:
     virtual lox_value call(interpreter& interpreter, std::vector<lox_value>& arguments) = 0;
     virtual int arity() = 0;
+    virtual std::string  to_string() = 0;
 };
 
 #endif 

@@ -6,6 +6,8 @@
 #include "lox_value.h"
 
 class lox_clock : public lox_callable {
+private:
+    const std::string name = "clock";
 public:
     int arity() override {
         return 0;
@@ -16,6 +18,10 @@ public:
                 std::chrono::system_clock::now().time_since_epoch()
         ).count();
         return currentTime / 1000;
+    }
+    
+    std::string  to_string() override {
+        return "<fn " + name + ">";
     }
 };
 

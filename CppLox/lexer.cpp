@@ -177,7 +177,7 @@ void lexer::scan_string() {
         return;
     }
     current++;
-    std::string string = source.substr(start + 1, current - start - 1);
+    std::string string = source.substr(start + 1, current - start - 2);
     add_token(STRING, string);
 }
 

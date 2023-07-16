@@ -19,9 +19,26 @@ void interpreter::report_runtime_error(runtime_error &error) {
     std::cerr << error.what() << "\n[line " << error.token_.line << "]";
 }
 
+void interpreter::execute_function(const std::unique_ptr<statement>& body, std::unique_ptr<enviroment>& function_env) {
+    std::unique_ptr<enviroment> outscope_env = std::move(env);
+    env = std::move(function_env);
+    execute(body);         
+    env = std::move(outscope_env);
+}
+
 void interpreter::execute(const std::unique_ptr<statement>& statement) {
     statement->accept(this);
 }
+
+void interpreter::visit_function_declaration_statement(const function_declaration_statement& statement) {
+    lox_function* function = new lox_function(&statement);
+    if (!env->has_enclosing()) {
+        global_env->declare(statement.name, function);
+        return;
+    }
+    env->declare(statement.name, function);
+}
+
 
 void interpreter::visit_var_declaration_statement(const var_declaration_statement& statement) {
     auto declare_variable = [&](std::unique_ptr<enviroment>& enviroment) {
@@ -243,7 +260,7 @@ std::string interpreter::to_string(const lox_value &value) {
             return "reference";
             
         case lox_types::LOX_CALLABLE:
-            return "anonymous_function";
+            return std::get<lox_callable*>(value)->to_string();
             
         default:
             return "";

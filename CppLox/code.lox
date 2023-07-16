@@ -1,1 +1,6 @@
-print(clock());
+fn oi() {
+    var m = "ola";
+    print m;
+}
+
+oi();
