@@ -6,9 +6,7 @@ lox_value lox_function::call(interpreter& interpreter, std::vector<lox_value>& a
         env->declare(function_declaration->parameters[i], arguments[i]); 
     }
     
-    interpreter.execute_function(function_declaration->body, env);
-    
-    return static_cast<void*>(nullptr);
+    return interpreter.execute_function(function_declaration->body, env);
 }
 
 int lox_function::arity() {

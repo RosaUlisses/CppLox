@@ -1,6 +1,11 @@
-fn oi() {
-    var m = "ola";
-    print m;
+fn fib(x) {
+    if(x == 1) {
+        return 0; 
+    }
+     if(x == 2) {
+         return 1; 
+    }   
+    return fib(x - 1) + fib(x - 2);
 }
 
-oi();
+print(fib(10));

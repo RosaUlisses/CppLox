@@ -23,7 +23,7 @@ std::unique_ptr<statement> parser::declaration_stmt() {
 
         return parse_statement();
     }
-    catch (parse_error &error) {
+    catch (parse_error& error) {
         had_error = true;
         // todo -> syncronize        
         return nullptr;
@@ -47,9 +47,13 @@ std::unique_ptr<statement> parser::function_declaration_stmt() {
     consume(RIGHT_PARENTESIS, "Expect ')' after parameters.");
 
     consume(LEFT_BRACE, "Expect '{' before a function/method body.");
-    std::unique_ptr<statement> block = block_stmt();
+    std::vector<std::unique_ptr<statement>> body;
+    while (!is_current_at_end() && tokens[current].type != RIGHT_BRACE) {
+        body.push_back(declaration_stmt()); 
+    }
+    consume(RIGHT_BRACE, "Expect '}' after function/method body.");
     
-    return std::unique_ptr<statement>(new function_declaration_statement(name, parameters, block));
+    return std::unique_ptr<statement>(new function_declaration_statement(name, parameters, body));
 }
 
 std::unique_ptr<statement> parser::var_declaration_stmt() {
@@ -70,6 +74,7 @@ std::unique_ptr<statement> parser::parse_statement() {
     if (match({WHILE})) return while_stmt();
     if (match({CONTINUE})) return continue_stmt();
     if (match({BREAK})) return break_stmt();
+    if (match({RETURN})) return return_stmt();
     if (match({FOR})) return for_stmt();
     if (match({PRINT})) return print_stmt();
     if (match({LEFT_BRACE})) return block_stmt();
@@ -124,6 +129,19 @@ std::unique_ptr<statement> parser::break_stmt() {
     }
 
     return stmt;
+}
+
+std::unique_ptr<statement> parser::return_stmt() {
+    token keyword = get_previous_token();
+    std::unique_ptr<expression> value = nullptr;
+    
+    if (tokens[current].type != SEMICOLON) {
+        value = parse_expression();
+    }
+
+    consume(SEMICOLON, "Expect ';' after return a value.");
+    
+    return std::unique_ptr<statement>(new return_statement(keyword, value));
 }
 
 std::unique_ptr<statement> parser::for_stmt() {

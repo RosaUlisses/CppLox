@@ -34,6 +34,7 @@ private:
     std::unique_ptr<statement> while_stmt();
     std::unique_ptr<statement> continue_stmt();
     std::unique_ptr<statement> break_stmt();
+    std::unique_ptr<statement> return_stmt();
     std::unique_ptr<statement> for_stmt();
     std::unique_ptr<statement> print_stmt();
     std::unique_ptr<statement> expression_stmt();

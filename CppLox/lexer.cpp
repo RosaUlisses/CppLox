@@ -14,6 +14,7 @@ std::unordered_map<std::string, token_type> lexer::key_words = {
         {"class", CLASS},
         {"this",  THIS},
         {"super", SUPER},
+        {"return", RETURN},
         {"var",   VAR},
         {"fn",   FN},
         {"print", PRINT}

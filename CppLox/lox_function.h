@@ -4,6 +4,7 @@
 #include "interpreter.h"
 #include "statement.h"
 #include "enviroment.h"
+#include "error.h"
 
 class lox_function : public lox_callable {
 private:

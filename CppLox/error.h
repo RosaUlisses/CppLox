@@ -4,6 +4,12 @@
 #include <stdexcept>
 #include "token.h"
 
+class return_exception : public std::runtime_error {
+public:
+    lox_value value;
+    return_exception(lox_value value) : value(value), std::runtime_error("") {}
+};
+
 class runtime_error : public std::runtime_error {
 public:
     token token_;

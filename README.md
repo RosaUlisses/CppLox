@@ -4,10 +4,10 @@ A interpreter for Lox programming language
 program                 →  declaration* EOF ; \
 delcaration             →  funcDecl | varDecl | statement ; \
 funcDecl                →  "fn" anonymous_function ; \
-anonymous_function                →  IDENTIFIER "(" parameters* ")" block ; \
 parameters              →  IDENTIFIER ( "," IDENTIFIER )* ; \
 varDecl                 →  "var" IDENTIFIER ("=" expression)? ";" ; \
-statement               →  exprStmt | printStmt | ifStmt | whileStmt | continueStmt | breakStmt | forStmt ; \
+statement               →  exprStmt | printStmt | ifStmt | whileStmt | continueStmt | breakStmt | forStmt | returnSmt ; \
+returnStmt              →  "return" expression? ";" ; \
 continueStmt            →  "continue" ";" ; \
 breakStmt               →  "break" ";" ; \
 ifStmt                  →  "if" "(" expression ")" statement ("else" statement)* ; \

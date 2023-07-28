@@ -19,11 +19,20 @@ void interpreter::report_runtime_error(runtime_error &error) {
     std::cerr << error.what() << "\n[line " << error.token_.line << "]";
 }
 
-void interpreter::execute_function(const std::unique_ptr<statement>& body, std::unique_ptr<enviroment>& function_env) {
+lox_value interpreter::execute_function(const std::vector<std::unique_ptr<statement>>& body, std::unique_ptr<enviroment>& function_env) {
     std::unique_ptr<enviroment> outscope_env = std::move(env);
     env = std::move(function_env);
-    execute(body);         
+
+    try {
+        std::for_each(body.begin(), body.end(), [&](const std::unique_ptr<statement>& stmt) { execute(stmt); });
+    }
+    catch (return_exception& return_) {
+        env = std::move(outscope_env);
+        return return_.value;
+    }
+    
     env = std::move(outscope_env);
+    return static_cast<void*>(nullptr);
 }
 
 void interpreter::execute(const std::unique_ptr<statement>& statement) {
@@ -116,6 +125,13 @@ void interpreter::visit_print_statement(const print_statement& statement) {
 
 void interpreter::visit_expression_statement(const expression_statement& statement) {
     evaluate(statement.expr); 
+}
+
+void interpreter::visit_return_statement(const return_statement& statement) {
+    lox_value value = static_cast<void*>(nullptr);
+    if (statement.expr) value = evaluate(statement.expr);
+       
+    throw return_exception(value);
 }
 
 lox_value interpreter::evaluate(const std::unique_ptr<expression>& expression) {

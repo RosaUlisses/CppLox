@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <stack>
 #include "lox_function.h"
 #include "expression.h"
 #include "statement.h"
@@ -17,12 +18,14 @@
 
 class interpreter : public expression_visitor, public statement_visitor {
 public:
-    interpreter(std::vector<std::unique_ptr<statement>> &statements): statements(std::move(statements)), env(new enviroment()), global_env(new enviroment()){
+    interpreter(std::vector<std::unique_ptr<statement>> &statements): statements(std::move(statements)), env(new enviroment()), global_env(new enviroment()) {
         global_env->declare("clock", static_cast<lox_callable*>(new lox_clock())); 
     }
     void interpret();
     enviroment* get_global_enviroment();
-    void execute_function(const std::unique_ptr<statement>& body, std::unique_ptr<enviroment>& function_env);
+    lox_value execute_function(const std::vector<std::unique_ptr<statement>>& body, std::unique_ptr<enviroment>& function_env);
+
+
 
 private:
     std::unique_ptr<enviroment> env;
@@ -43,6 +46,7 @@ private:
     void visit_break_statement(const break_statement& statement) override;
     void visit_print_statement(const print_statement& statement) override;
     void visit_expression_statement(const expression_statement& statement) override;
+    void visit_return_statement(const return_statement& statement) override;
     
     
     lox_value evaluate(const std::unique_ptr<expression>& expression);

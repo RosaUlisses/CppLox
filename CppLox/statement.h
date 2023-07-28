@@ -12,6 +12,7 @@ class continue_statement;
 class break_statement;
 class print_statement;
 class expression_statement;
+class return_statement;
 
 class statement_visitor {
 public:
@@ -24,6 +25,7 @@ public:
    virtual void visit_break_statement(const break_statement& statement) = 0;
    virtual void visit_print_statement(const print_statement& statement) = 0;
    virtual void visit_expression_statement(const expression_statement& statement) = 0;
+   virtual void visit_return_statement(const return_statement& statement) = 0;
    
 };
 
@@ -37,9 +39,9 @@ class function_declaration_statement : public statement {
 public:
     const token name;
     const std::vector<token> parameters;
-    const std::unique_ptr<statement> body;
+    const std::vector<std::unique_ptr<statement>> body;
 
-    function_declaration_statement(token name, std::vector<token>& parameters, std::unique_ptr<statement>& body) : name(name), parameters(parameters), body(std::move(body)) {}
+    function_declaration_statement(token name, std::vector<token>& parameters, std::vector<std::unique_ptr<statement>>& body) : name(name), parameters(parameters), body(std::move(body)) {}
 
     void accept(statement_visitor* visitor) override {
         visitor->visit_function_declaration_statement(*this);
@@ -152,6 +154,18 @@ public:
     ~expression_statement() override = default;
 };
 
+class return_statement : public statement {
+public:
+    const token keyword;
+    const std::unique_ptr<expression> expr;
 
+    return_statement(token keyword, std::unique_ptr<expression>& expr) : keyword(keyword), expr(std::move(expr)) {}
+
+    void accept(statement_visitor* visitor) override {
+        visitor->visit_return_statement(*this);
+    }
+
+    ~return_statement() override = default;
+};
 
 #endif 
