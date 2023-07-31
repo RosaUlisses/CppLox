@@ -31,8 +31,8 @@ std::unique_ptr<statement> parser::declaration_stmt() {
 }
 
 std::unique_ptr<statement> parser::function_declaration_stmt() {
-    token name = consume(IDENTIFIER, "Expect anonymous_function/method name.");
-    consume(LEFT_PARENTESIS, "Expect '(' after ");
+    token name = consume(IDENTIFIER, "Expect function/method name.");
+    consume(LEFT_PARENTESIS, "Expect '(' after parameters.");
    
     std::vector<token> parameters;
 
@@ -218,7 +218,13 @@ std::unique_ptr<expression> parser::parse_expression() {
 
 
 std::unique_ptr<expression> parser::assignment() {
-    auto expr = ternary();
+    std::unique_ptr<expression> expr;
+    
+    if (tokens[current].type == FN) {
+        current++;
+        expr = lambda();  
+    } 
+    else expr = ternary();
 
     if (match({EQUAL})) {
         token equals = get_previous_token();
@@ -233,6 +239,32 @@ std::unique_ptr<expression> parser::assignment() {
     }
 
     return expr;
+}
+
+std::unique_ptr<expression> parser::lambda() {
+    consume(LEFT_PARENTESIS, "Expect '(' before parameters.");
+
+    std::vector<token> parameters;
+    if (tokens[current].type != RIGHT_PARENTESIS) {
+        do {
+            if (parameters.size() > parser::MAX_ARGUMENT_COUNT) {
+                report_parsing_error(tokens[current], "Can not have more than " + std::to_string(parser::MAX_ARGUMENT_COUNT) + "parameters.");
+            }
+            parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+        } while(match({COMMA}));       
+    }
+
+    consume(RIGHT_PARENTESIS, "Expect ')' after parameters.");
+    consume(LEFT_BRACE, "Expect '{' before function/method body.");
+    
+    std::vector<std::any> body;
+    while (!is_current_at_end() && tokens[current].type != RIGHT_BRACE) {
+        std::unique_ptr<statement>* stmt = new std::unique_ptr<statement>(std::move(declaration_stmt()));
+        body.push_back(stmt);
+    }
+    consume(RIGHT_BRACE, "Expect '}' after function/method body.");
+    
+    return std::unique_ptr<expression>(new lambda_expression(parameters, body));
 }
 
 std::unique_ptr<expression> parser::ternary() {

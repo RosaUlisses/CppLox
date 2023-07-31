@@ -41,8 +41,8 @@ private:
     
     
     std::unique_ptr<expression> parse_expression();
-    std::unique_ptr<expression> anonymous_function();
     std::unique_ptr<expression> assignment();
+    std::unique_ptr<expression> lambda();
     std::unique_ptr<expression> ternary();
     std::unique_ptr<expression> logic_or();
     std::unique_ptr<expression> logic_and();

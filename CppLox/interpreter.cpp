@@ -25,6 +25,9 @@ lox_value interpreter::execute_function(const std::vector<std::unique_ptr<statem
 
     try {
         std::for_each(body.begin(), body.end(), [&](const std::unique_ptr<statement>& stmt) { execute(stmt); });
+//        for (auto& stmt : body) {
+//            execute(stmt); 
+//        }
     }
     catch (return_exception& return_) {
         env = std::move(outscope_env);
@@ -33,6 +36,23 @@ lox_value interpreter::execute_function(const std::vector<std::unique_ptr<statem
     
     env = std::move(outscope_env);
     return static_cast<void*>(nullptr);
+}
+
+
+lox_value interpreter::execute_lambda(const std::vector<std::unique_ptr<statement>*>& body, std::unique_ptr<enviroment>& function_env) { 
+    std::shared_ptr<enviroment> outscope_env = env; 
+    env = std::move(function_env);
+    
+    try {
+        std::for_each(body.begin(), body.end(), [&](const auto& stmt) { execute(*stmt); }); 
+    }
+    catch (return_exception& return_) {
+        env = std::move(outscope_env);
+        return return_.value;
+    }
+
+    env = std::move(outscope_env);
+    return static_cast<void*>(nullptr);   
 }
 
 void interpreter::execute(const std::unique_ptr<statement>& statement) {
@@ -252,6 +272,11 @@ lox_value interpreter::visit_literal_expression(const literal_expression& expres
 
 lox_value interpreter::visit_var_expression(const variable_expression& expression) {
     return env->get(expression.name);
+}
+
+lox_value  interpreter::visit_lambda_expression(const lambda_expression& expression) {
+    lox_lambda* lambda =  new lox_lambda(&expression, env);
+    return reinterpret_cast<lox_callable*>(lambda);   
 }
 
 std::string interpreter::to_string(const lox_value &value) {

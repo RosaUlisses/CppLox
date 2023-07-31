@@ -25,8 +25,7 @@ public:
     void interpret();
     enviroment* get_global_enviroment();
     lox_value execute_function(const std::vector<std::unique_ptr<statement>>& body, std::unique_ptr<enviroment>& function_env);
-
-
+    lox_value execute_lambda(const std::vector<std::unique_ptr<statement>*>& body, std::unique_ptr<enviroment>& function_env); 
 
 private:
     enviroment* global_env;
@@ -60,6 +59,7 @@ private:
     lox_value visit_grouping_expression(const grouping_expression& expression) override;
     lox_value visit_literal_expression(const literal_expression& expression) override;
     lox_value visit_var_expression(const variable_expression& expression) override;
+    lox_value visit_lambda_expression(const lambda_expression& expression) override;
 
 
     std::string  to_string(const lox_value& value);

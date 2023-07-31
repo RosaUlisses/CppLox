@@ -21,4 +21,18 @@ public:
     std::string to_string() override;
 };
 
+class lox_lambda : public lox_callable {
+private:
+    const lambda_expression* lambda_expr;
+    const std::shared_ptr<enviroment> closure;
+
+public:    
+    lox_lambda(const lambda_expression* lambda_expr, const std::shared_ptr<enviroment>& closure): lambda_expr(lambda_expr), closure(closure) {
+    }
+
+    lox_value call(interpreter& interpreter, std::vector<lox_value>& arguments) override;
+    int arity() override;
+    std::string to_string() override;
+};
+
 #endif

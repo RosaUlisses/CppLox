@@ -4,6 +4,7 @@
 #include "token.h"
 #include "lox_value.h"
 #include <memory>
+#include <any>
 
 class assignment_expression;
 class ternary_expression;
@@ -13,6 +14,7 @@ class call_expression;
 class grouping_expression;
 class literal_expression;
 class variable_expression;
+class lambda_expression;
 
 class expression_visitor {
 public:
@@ -24,6 +26,7 @@ public:
     virtual lox_value visit_grouping_expression(const grouping_expression& expression) = 0;
     virtual lox_value visit_literal_expression(const literal_expression& expression) = 0;
     virtual lox_value visit_var_expression(const variable_expression& expression) = 0;
+    virtual lox_value visit_lambda_expression(const lambda_expression& expression) = 0;
 };
 
 
@@ -155,6 +158,23 @@ public:
     }
 
     ~variable_expression() override = default;
+};
+
+class lambda_expression : public expression {
+public:
+    const std::vector<token> parameters;
+    /*
+        Due to C++ I could not define the type of body as a std::vector<std::unique_ptr<statement> here. So I decided to define body as a std::vector<std::any>. 
+        Given this I save in body values of the type std::unique_ptr<statement>*. With that the interpreter can extract the statements stored in body and execute them without
+        getting type-safety problems.
+     */
+    const std::vector<std::any> body;
+
+    lambda_expression(std::vector<token>& parameters, std::vector<std::any>& body) :  parameters(std::move(parameters)), body(std::move(body)) {};
+
+    lox_value accept(expression_visitor* visitor) override {
+        return visitor->visit_lambda_expression(*this);
+    }
 };
 
 #endif

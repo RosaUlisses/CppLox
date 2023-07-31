@@ -1,15 +1,13 @@
-fn makeCounter() {
+fn createCounter() {
     var i = 0;
     
-    fn counter() {
+    return fn() {
         i = i + 1;
         print(i + "\n");
-    }
-    
-    return counter;
+    };
 }
 
-var c = makeCounter();
+var c = createCounter();
 c();
 c();
 c();
