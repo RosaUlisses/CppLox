@@ -18,8 +18,9 @@
 
 class interpreter : public expression_visitor, public statement_visitor {
 public:
-    interpreter(std::vector<std::unique_ptr<statement>> &statements): statements(std::move(statements)), env(new enviroment()), global_env(new enviroment()) {
-        global_env->declare("clock", static_cast<lox_callable*>(new lox_clock())); 
+    interpreter(std::vector<std::unique_ptr<statement>> &statements): statements(std::move(statements)), env(new enviroment()) {
+        global_env = env.get();
+        env->declare("clock", static_cast<lox_callable*>(new lox_clock())); 
     }
     void interpret();
     enviroment* get_global_enviroment();
@@ -28,8 +29,8 @@ public:
 
 
 private:
-    std::unique_ptr<enviroment> env;
-    std::unique_ptr<enviroment> global_env;
+    enviroment* global_env;
+    std::shared_ptr<enviroment> env;
     bool should_continue = false;
     bool should_break = false;
     const std::vector<std::unique_ptr<statement>> statements;

@@ -1,7 +1,7 @@
 #include "lox_function.h"
 
 lox_value lox_function::call(interpreter& interpreter, std::vector<lox_value>& arguments) {
-    std::unique_ptr<enviroment> env = std::make_unique<enviroment>(interpreter.get_global_enviroment());
+    std::unique_ptr<enviroment> env = std::make_unique<enviroment>(closure.get());
     for (int i = 0; i < function_declaration->parameters.size(); ++i) {
         env->declare(function_declaration->parameters[i], arguments[i]); 
     }

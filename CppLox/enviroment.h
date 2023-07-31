@@ -31,10 +31,6 @@ public:
         return values.find(name.lexeme) != values.end();
     }
     
-    bool has_enclosing() {
-        return enclosing != nullptr;
-    }
-
     void declare(const token& name, const lox_value value) {
         values.insert({name.lexeme, value});
         assigned_variables.insert(name.lexeme);

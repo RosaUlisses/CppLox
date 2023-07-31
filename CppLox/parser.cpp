@@ -226,7 +226,7 @@ std::unique_ptr<expression> parser::assignment() {
 
         if (typeid(*expr) == typeid(variable_expression)) {
             token name = dynamic_cast<variable_expression *>(expr.get())->name;
-            std::unique_ptr<expression>(new assignment_expression(name, value));
+            return std::unique_ptr<expression>(new assignment_expression(name, value));
         }
 
         report_parsing_error(equals, "Invalid assignment target.");

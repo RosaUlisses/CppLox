@@ -179,6 +179,13 @@ void lexer::scan_string() {
     }
     current++;
     std::string string = source.substr(start + 1, current - start - 2);
+
+    size_t break_line_position = string.find("\\n");
+    while (break_line_position != std::string::npos) {
+        string.replace(break_line_position, 2, "\n");
+        break_line_position = string.find("\\n", break_line_position + 1);
+    }
+    
     add_token(STRING, string);
 }
 

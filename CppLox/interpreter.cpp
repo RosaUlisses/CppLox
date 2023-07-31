@@ -12,15 +12,15 @@ void interpreter::interpret() {
 }
 
 enviroment *interpreter::get_global_enviroment() {
-    return global_env.get();
+    return global_env;
 }
 
 void interpreter::report_runtime_error(runtime_error &error) {
-    std::cerr << error.what() << "\n[line " << error.token_.line << "]";
+    std::cerr << "[line " << error.token_.line << "] " << error.what();
 }
 
 lox_value interpreter::execute_function(const std::vector<std::unique_ptr<statement>>& body, std::unique_ptr<enviroment>& function_env) {
-    std::unique_ptr<enviroment> outscope_env = std::move(env);
+    std::shared_ptr<enviroment> outscope_env = env;
     env = std::move(function_env);
 
     try {
@@ -40,32 +40,23 @@ void interpreter::execute(const std::unique_ptr<statement>& statement) {
 }
 
 void interpreter::visit_function_declaration_statement(const function_declaration_statement& statement) {
-    lox_function* function = new lox_function(&statement);
-    if (!env->has_enclosing()) {
-        global_env->declare(statement.name, function);
-        return;
-    }
+    lox_function* function = new lox_function(&statement, env);
     env->declare(statement.name, function);
 }
 
 
 void interpreter::visit_var_declaration_statement(const var_declaration_statement& statement) {
-    auto declare_variable = [&](std::unique_ptr<enviroment>& enviroment) {
-        if (statement.initializer == nullptr) {
-            enviroment->declare(statement.name);
-        }
-        enviroment->declare(statement.name, this->evaluate(statement.initializer));        
-    };  
-    
-    if (!env->has_enclosing()) declare_variable(global_env);
-    else declare_variable(global_env);
+    if (statement.initializer == nullptr) {
+        env->declare(statement.name);
+    }
+    env->declare(statement.name, this->evaluate(statement.initializer));        
 }
 
 void interpreter::visit_block_statement(const block_statement& statement) {
     if (should_break || should_continue) return; 
     
-    std::unique_ptr<enviroment> previous = std::move(env);
-    env = std::make_unique<enviroment>(previous.get());
+    std::shared_ptr<enviroment> previous = env;
+    env = std::make_shared<enviroment>(previous.get());
     
     for (auto const& stmt : statement.statements) {
         if (typeid(*stmt) == typeid(continue_statement)) {
@@ -80,7 +71,7 @@ void interpreter::visit_block_statement(const block_statement& statement) {
         execute(stmt); 
     }
      
-    env = std::move(previous); 
+    env = previous; 
 }
 
 void interpreter::visit_if_statement(const if_statement& statement) {
@@ -165,8 +156,16 @@ lox_value interpreter::visit_binary_expression(const binary_expression& expressi
         
         case PLUS:
             check_number_or_string_operands(expression.operator_, left, right);
-            if (left.index() == lox_types::DOUBLE) return std::get<double>(left) + std::get<double>(right);
-            return std::get<std::string>(left) + std::get<std::string>(right);
+            if (left.index() == lox_types::DOUBLE && right.index() == lox_types::DOUBLE) {
+                return std::get<double>(left) + std::get<double>(right); 
+            } 
+            if (left.index() == lox_types::STRING && right.index() == lox_types::STRING) return std::get<std::string>(left) + std::get<std::string>(right);
+            if (left.index() == lox_types::DOUBLE) {
+                std::string string = std::get<std::string>(right);
+                return std::to_string(std::get<double>(left)) + std::get<std::string>(right);  
+            } 
+            return std::get<std::string>(left) + std::to_string(std::get<double>(right));
+            
         
         case MINUS:
             check_number_operands(expression.operator_, left, right);
@@ -252,10 +251,6 @@ lox_value interpreter::visit_literal_expression(const literal_expression& expres
 }
 
 lox_value interpreter::visit_var_expression(const variable_expression& expression) {
-    if (global_env->contains(expression.name)) {
-        return global_env->get(expression.name);
-    }
-    
     return env->get(expression.name);
 }
 
@@ -295,7 +290,7 @@ bool interpreter::is_truthy(const lox_value& value) {
 }
 
 void interpreter::check_number_or_string_operands(token token_, const lox_value& left, const lox_value& right) {
-    if ((left.index() != lox_types::DOUBLE || right.index() != lox_types::DOUBLE) && (left.index() != lox_types::STRING || right.index() != lox_types::STRING) ) {
+    if ((left.index() == lox_types::DOUBLE && left.index() == lox_types::DOUBLE) && (left.index() == lox_types::STRING && right.index() == lox_types::STRING) ) {
         throw runtime_error(token_, "Operands must be numbers or strings.");
     }
 }

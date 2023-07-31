@@ -1,11 +1,15 @@
-fn fib(x) {
-    if(x == 1) {
-        return 0; 
+fn makeCounter() {
+    var i = 0;
+    
+    fn counter() {
+        i = i + 1;
+        print(i + "\n");
     }
-     if(x == 2) {
-         return 1; 
-    }   
-    return fib(x - 1) + fib(x - 2);
+    
+    return counter;
 }
 
-print(fib(10));
+var c = makeCounter();
+c();
+c();
+c();
