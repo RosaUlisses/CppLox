@@ -53,18 +53,18 @@ public:
         return assigned_variables.find(name.lexeme) == assigned_variables.end();
     }
     
-    lox_value get(const token& name) {
+    lox_value get(const token& name, int distance) {
+        if (distance > 0) {
+            return enclosing->get(name, distance - 1);
+        } 
+        
         if (variable_declared(name)) {
             if (variable_not_assigned(name)) {
                 throw runtime_error(name, "Accessing unassigned variable '" + name.lexeme + "'.");
             }
             return values[name.lexeme];
         }
-
-        if (enclosing != nullptr) {
-           return enclosing->get(name);
-        }
-
+        
         throw runtime_error(name, "Undefined variable '" + name.lexeme + "' .");
     }
 

@@ -2,6 +2,8 @@
 #define CPPLOX_PARSER_H
 
 #include <vector>
+#include <unordered_map>
+#include <unordered_set>
 #include <stdexcept>
 #include <iostream>
 #include "token.h"
@@ -10,18 +12,24 @@
 
 class parser {
 public:
+    parser::parser(std::vector<token> tokens) : tokens(tokens) {
+        scope_stack.push_back(scope());
+    }
     class parse_error : public std::runtime_error {
     public:
         parse_error();
     };
-    parser(std::vector<token> tokens);
     std::vector<std::unique_ptr<statement>> parse();
+    bool had_error = false;
 
 private:
+    typedef std::unordered_set<token, token_hash> scope;
+    
     std::vector<token> tokens;
     int current = 0;
-    bool had_error = false;
+    std::vector<scope> scope_stack;
     bool parsing_loop = false;
+    bool parsing_function = false;
     static constexpr int MAX_ARGUMENT_COUNT = 255;
 
     

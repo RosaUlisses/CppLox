@@ -16,4 +16,4 @@ public:
     runtime_error(token token_, const std::string &message) : token_(token_), std::runtime_error(message) { }
 };
 
-#endif //CPPLOX_ERROR_H
+#endif

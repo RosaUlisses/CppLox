@@ -39,4 +39,3 @@ int lox_lambda::arity() {
 std::string  lox_lambda::to_string() {
     return "<fn anonymous>";
 }
-

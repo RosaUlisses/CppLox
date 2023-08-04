@@ -1,13 +1,13 @@
-fn createCounter() {
-    var i = 0;
+return 0;
+var g = "global";
+{
+    var printf = fn() {
+        print(g);
+    }; 
     
-    return fn() {
-        i = i + 1;
-        print(i + "\n");
-    };
+    
+    var g = "local";
+    
+    printf();
+    printf();
 }
-
-var c = createCounter();
-c();
-c();
-c();

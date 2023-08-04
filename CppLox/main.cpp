@@ -16,9 +16,12 @@ std::string get_source_code() {
 int main() {
     std::string source = get_source_code();
     std::vector<token> tokens = lexer::scan_tokens(source);
-    auto expr = parser(tokens).parse();
-    interpreter intepreter(expr);
-    intepreter.interpret();
+    parser parser(tokens);
+    std::vector<std::unique_ptr<statement>> statements = parser.parse();
+    if (!parser.had_error) {
+        interpreter intepreter(statements);
+        intepreter.interpret();
+    }
 
     return 0;
 }

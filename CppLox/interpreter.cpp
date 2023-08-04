@@ -25,9 +25,6 @@ lox_value interpreter::execute_function(const std::vector<std::unique_ptr<statem
 
     try {
         std::for_each(body.begin(), body.end(), [&](const std::unique_ptr<statement>& stmt) { execute(stmt); });
-//        for (auto& stmt : body) {
-//            execute(stmt); 
-//        }
     }
     catch (return_exception& return_) {
         env = std::move(outscope_env);
@@ -271,7 +268,7 @@ lox_value interpreter::visit_literal_expression(const literal_expression& expres
 }
 
 lox_value interpreter::visit_var_expression(const variable_expression& expression) {
-    return env->get(expression.name);
+    return env->get(expression.name, expression.distance);
 }
 
 lox_value  interpreter::visit_lambda_expression(const lambda_expression& expression) {

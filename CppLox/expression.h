@@ -150,8 +150,9 @@ public:
 class variable_expression : public expression {
 public:
     const token name;
+    const int distance;
 
-    variable_expression(token name) : name(name) {};
+    variable_expression(token name, int distance) : name(name), distance(distance) {};
 
     lox_value accept(expression_visitor* visitor) override {
         return visitor->visit_var_expression(*this);

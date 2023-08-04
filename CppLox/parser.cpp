@@ -1,9 +1,6 @@
 #include "parser.h"
 #include <algorithm>
 
-
-parser::parser(std::vector<token> tokens) : tokens(tokens) {}
-
 parser::parse_error::parse_error() : std::runtime_error("") {}
 
 std::vector<std::unique_ptr<statement>> parser::parse() {
@@ -33,6 +30,8 @@ std::unique_ptr<statement> parser::declaration_stmt() {
 std::unique_ptr<statement> parser::function_declaration_stmt() {
     token name = consume(IDENTIFIER, "Expect function/method name.");
     consume(LEFT_PARENTESIS, "Expect '(' after parameters.");
+    
+    scope_stack[scope_stack.size() - 1].insert(name);
    
     std::vector<token> parameters;
 
@@ -44,14 +43,21 @@ std::unique_ptr<statement> parser::function_declaration_stmt() {
             parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
         }while(match({COMMA}));       
     }
+    
     consume(RIGHT_PARENTESIS, "Expect ')' after parameters.");
-
     consume(LEFT_BRACE, "Expect '{' before a function/method body.");
+    
+    scope_stack.push_back(scope());
+    
+    parsing_function = true;
+    
     std::vector<std::unique_ptr<statement>> body;
     while (!is_current_at_end() && tokens[current].type != RIGHT_BRACE) {
         body.push_back(declaration_stmt()); 
     }
     consume(RIGHT_BRACE, "Expect '}' after function/method body.");
+    
+    scope_stack.pop_back();
     
     return std::unique_ptr<statement>(new function_declaration_statement(name, parameters, body));
 }
@@ -65,6 +71,8 @@ std::unique_ptr<statement> parser::var_declaration_stmt() {
     }
 
     consume(SEMICOLON, "Expect ';' after variable declaration.");
+    
+    scope_stack[scope_stack.size() - 1].insert(name);
 
     return std::unique_ptr<statement>(new var_declaration_statement(name, initializer));
 }
@@ -139,8 +147,12 @@ std::unique_ptr<statement> parser::return_stmt() {
         value = parse_expression();
     }
 
+    if (!parsing_function) {
+        generate_parse_error(keyword, "Can not return at top level of the code.");
+    }
+
     consume(SEMICOLON, "Expect ';' after return a value.");
-    
+
     return std::unique_ptr<statement>(new return_statement(keyword, value));
 }
 
@@ -190,12 +202,16 @@ std::unique_ptr<statement> parser::for_stmt() {
 }
 
 std::unique_ptr<statement> parser::block_stmt() {
+    scope_stack.push_back(scope());
     std::vector<std::unique_ptr<statement>> statements;
+    
     while (!is_current_at_end() && tokens[current].type != RIGHT_BRACE) {
         statements.push_back(declaration_stmt());
     }
 
     consume(RIGHT_BRACE, "Expect '}' after block.");
+    
+    scope_stack.pop_back();
 
     return std::unique_ptr<statement>(new block_statement(statements));
 }
@@ -222,7 +238,7 @@ std::unique_ptr<expression> parser::assignment() {
     
     if (tokens[current].type == FN) {
         current++;
-        expr = lambda();  
+        return lambda();  
     } 
     else expr = ternary();
 
@@ -255,14 +271,21 @@ std::unique_ptr<expression> parser::lambda() {
     }
 
     consume(RIGHT_PARENTESIS, "Expect ')' after parameters.");
-    consume(LEFT_BRACE, "Expect '{' before function/method body.");
+    consume(LEFT_BRACE, "Expect '{' before function body.");
+    
+    parsing_function = true;
+
+    scope_stack.push_back(scope());
     
     std::vector<std::any> body;
+    
     while (!is_current_at_end() && tokens[current].type != RIGHT_BRACE) {
         std::unique_ptr<statement>* stmt = new std::unique_ptr<statement>(std::move(declaration_stmt()));
         body.push_back(stmt);
     }
-    consume(RIGHT_BRACE, "Expect '}' after function/method body.");
+    consume(RIGHT_BRACE, "Expect '}' after function body.");
+    
+    scope_stack.pop_back();
     
     return std::unique_ptr<expression>(new lambda_expression(parameters, body));
 }
@@ -411,7 +434,15 @@ std::unique_ptr<expression> parser::primary() {
 }
 
 std::unique_ptr<expression> parser::variable() {
-    return std::unique_ptr<expression>(new variable_expression(get_previous_token()));
+    token variable_name = get_previous_token(); 
+    
+    for (int i = scope_stack.size() - 1; i >= 0; i--) {
+        if (scope_stack[i].find(variable_name) != scope_stack[i].end()) {
+            return std::unique_ptr<expression>(new variable_expression(variable_name, scope_stack.size() - i - 1));
+        }
+    }
+    
+    // todo -> levantar excecao aqui.
 }
 
 token parser::consume(token_type type, std::string mensage) {
@@ -425,6 +456,7 @@ token parser::consume(token_type type, std::string mensage) {
 
 
 parser::parse_error parser::generate_parse_error(token token, std::string mensage) {
+    had_error = true;
     report_parsing_error(token, mensage);
     return parse_error();
 }

@@ -41,4 +41,10 @@ struct token {
     }
 };
 
-#endif //CPPLOX_TOKEN_H
+struct token_hash {
+    size_t operator() (const token& token) const {
+        return std::hash<std::string>()(token.lexeme);
+    }
+};
+
+#endif
