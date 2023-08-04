@@ -1,5 +1,0 @@
-C:\Users\ulisses.rosa.NOTE-1927\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\231.8770.66\bin\cmake\win\x64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -S C:\Programming\CppLox -B C:\Programming\CppLox\cmake-build-debug-visual-studio
--- Selecting Windows SDK version 10.0.19041.0 to target Windows 10.0.22621.
--- Configuring done
--- Generating done
--- Build files have been written to: C:/Programming/CppLox/cmake-build-debug-visual-studio
