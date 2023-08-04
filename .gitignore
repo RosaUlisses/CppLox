@@ -6,7 +6,6 @@
 # Ignored Files and folders of the project
 cmake-build-debug/
 cmake-build-debug-visual-studio/
-CMakeLists.txt
 .idea/
 CppLox/CMakeLists.txt
 CppLox/.idea/

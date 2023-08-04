@@ -1,5 +1,4 @@
-return 0;
-var g = "global";
+var g = "global\n";
 {
     var printf = fn() {
         print(g);
